@@ -1,0 +1,38 @@
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.CLTimer.resources
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.Resources.resources
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.vbproj.GenerateResource.Cache
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\bin\Debug\CLTimer.exe
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\bin\Debug\CLTimer.pdb
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\bin\Debug\CLTimer.xml
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.exe
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.xml
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.pdb
+E:\CL Timing system 10Aug15\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.exe
+E:\CL Timing system 10Aug15\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.xml
+E:\CL Timing system 10Aug15\CLTimer\CLTimer\CLTimer\obj\x86\Debug\CLTimer.pdb
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.exe
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.xml
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.pdb
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\bin\Debug\CLTimer.exe
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\bin\Debug\CLTimer.pdb
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\bin\Debug\CLTimer.xml
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.CLTimer.resources
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.Resources.resources
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.vbproj.GenerateResource.Cache
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\bin\Debug\CLTimer.exe.manifest
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\bin\Debug\CLTimer.application
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.exe.manifest
+C:\Our Files\Glenn\RaceTime\CLTimer\CLTimer\obj\x86\Debug\CLTimer.application
+C:\CL Timer\Source Files\CLTimer\CLTimer\bin\Debug\CLTimer.exe.manifest
+C:\CL Timer\Source Files\CLTimer\CLTimer\bin\Debug\CLTimer.application
+C:\CL Timer\Source Files\CLTimer\CLTimer\bin\Debug\CLTimer.exe
+C:\CL Timer\Source Files\CLTimer\CLTimer\bin\Debug\CLTimer.pdb
+C:\CL Timer\Source Files\CLTimer\CLTimer\bin\Debug\CLTimer.xml
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.CLTimer.resources
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.Resources.resources
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.vbproj.GenerateResource.Cache
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.exe.manifest
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.application
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.exe
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.xml
+C:\CL Timer\Source Files\CLTimer\CLTimer\obj\x86\Debug\CLTimer.pdb

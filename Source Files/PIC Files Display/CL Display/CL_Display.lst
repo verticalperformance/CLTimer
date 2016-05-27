@@ -1,0 +1,1061 @@
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ; source code for Control Line system displays
+                      00002 ;    Displays all have same code and use id switches on start up to set location
+                      00003 ;       There are 3 displays, each has 8 digits (board no's)
+                      00004 ;Pulse timing assumes xtal at 3.579 MHz   ///4.00Mhz
+                      00005 
+                      00006 ;History
+                      00007 ;
+                      00008 ;27/5/10 Copied from C:\PicJobs\Digital_Clk4
+                      00009 ;10/8/15 Test in debug looked OK - ready to test on hardware
+                      00010 ;18/8 call to test_count on start displayed 0 - 8 OK (once h/w issues fixed)
+                      00011 ;23/8 Set ID, display correct digit on start Ok.
+                      00012 ;   Decode of 422 data in OK.  
+                      00013 ;18/10 Changed data monitor to TMR1. Tested in debug, data fail at 4.8 secs
+                      00014 ;20/10 tested data fail and fixed display dim OK
+                      00015 ;TEMP stopped clear display at end of test_count
+                      00016 ;    
+                      00017 ;TO DO
+                      00018 ; check inc / dec intensity if at min / max. DONE NOT TESTED
+                      00019 ;               ^^^^^^^^^^^^^^^^^^^^^^^^
+                      00020 
+                      00021 
+                      00022         list      p=16f73           ; list directive to define processor
+                      00023         #include <p16F73.inc>        ; processor specific variable definitions
+                      00001         LIST
+                      00002 ; P16F73.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
+                      00320         LIST
+                      00024 
+2007   3FF1           00025         __CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
+                      00026 
+                      00027 
+  00000020            00028 scratch         equ     0x20
+                      00029 
+                      00030 ; variables
+                      00031 
+  00000021            00032 flag1           equ     scratch+0x1
+  00000022            00033 temp            equ             scratch+0x2
+  00000023            00034 rx_data         equ             scratch+0x3     
+  00000024            00035 fail            equ             scratch+0x4
+  00000025            00036 var2            equ             scratch+0x05
+  00000026            00037 disp_id         equ     scratch+0x06
+  00000027            00038 board_id        equ     scratch+0x07
+  00000028            00039 digit_id        equ     scratch+0x08
+  00000029            00040 curr_no         equ     scratch+0x09
+  00000030            00041 intens          equ             scratch+0x10
+  00000031            00042 aux_off         equ             scratch+0x11
+                      00043         
+                      00044 
+                      00045 ; constants
+  00000000            00046 indf    equ 0
+  00000004            00047 fsr             equ 4
+  00000003            00048 status  equ 3   ; status register, also at 0x83
+  00000005            00049 porta   equ     5
+  00000006            00050 portb   equ     6
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  00000007            00051 portc   equ     7
+  00000005            00052 trisa   equ     0x5     ; port ddr - in bank 1 (=85)
+  00000006            00053 trisb   equ     0x6
+  00000007            00054 trisc   equ     0x7
+  00000001            00055 tmr0    equ     1
+  00000001            00056 opt             equ     1       ;TMR0 option reg - in bank 1 (=81)
+  0000000E            00057 tmr1l   equ     0x0e
+  0000000F            00058 tmr1h   equ     0x0f
+  00000010            00059 t1con   equ     0x10
+  00000012            00060 t2con   equ     0x12
+  0000000C            00061 t2flag  equ     0x0c
+  00000011            00062 tmr2    equ     0x11
+  00000012            00063 pr2             equ     0x12    ; bank1 (=92)
+  0000001F            00064 adcon0  equ     0x1f
+  0000001E            00065 adres   equ     0x1e
+  00000019            00066 txreg   equ     0x19
+  0000000C            00067 pir1    equ     0x0c
+  0000000A            00068 pclath  equ     0x0a
+  00000018            00069 txsta   equ 0x18                ;bank1 =98
+  00000018            00070 rcsta   equ     0x18
+  0000001A            00071 rcreg   equ     0x1a
+  0000000B            00072 intcon  equ     0x0b
+  0000000C            00073 pie1    equ     0x0c    ;bank1 8c
+  0000009F            00074 adcon1  equ 0x9f
+  00000009            00075 spbrg           equ 0x09        ;bank1 {=99}
+  00000015            00076 ccpr1l  equ 0x15
+  00000017            00077 ccp1con equ     0x17
+                      00078 
+                      00079 ; Bit Definitions
+                      00080 
+                      00081 
+  00000005            00082 rp0             equ 5   ;register page
+  00000002            00083 ferr    equ     2       ;rx framing error
+  00000001            00084 oerr    equ     1       ; rx overun
+  00000004            00085 cren    equ     4       ;  rx en
+  00000005            00086 rcif    equ     5       ; rvcd data flag
+  00000001            00087 tmr2if  equ 1
+  00000000            00088 tmr1if  equ 0   ;tmr1 flag      
+  00000002            00089 t0if    equ 2   ;tmr0 flag
+                      00090 
+                      00091 ;flag1 bits
+  00000000            00092 tim_fl  equ     0
+  00000001            00093 id              equ     1
+  00000002            00094 dim             equ 2   ;port c, high = display off     
+  00000003            00095 aux             equ 3   ;flag that aux o/p is on. 
+                      00096         
+                      00097         
+                      00098 
+                      00099 ;************************************************************
+                      00100 ; port assignment
+                      00101 ;       RA0 = D1 Led
+                      00102 ;       RA1 = D2 Led
+                      00103 ;       RA2 = D3 Led
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00104 ;       RA3 = D4 Led
+                      00105 ;       RA4 = D5 Led
+                      00106 ;       RA5 = D6 Led
+                      00107 ;       RB0-3 = BCD value of display digit
+                      00108 ;       RB4 = DP Display 0 = On
+                      00109 ;       RB5 = Stat      0 = On
+                      00110 ;       RB6 = aux       1 = On
+                      00111 ;       RC0 = ID1
+                      00112 ;       RC1 = ID2
+                      00113 ;       RC3 = ID3
+                      00114 ;       RC4 = ID4
+                      00115 ;       RC5 = ID5
+                      00116 ;       RC7 = Rx Data In
+                      00117 
+                      00118 ;###########################################################################
+                      00119 ; begin
+                      00120         org     0
+                      00121 
+0000   2???           00122         goto    start
+                      00123         org 4
+0004   2???           00124         goto do_irq
+                      00125 
+                      00126         org     10      
+0010                  00127 start
+0010   01A1           00128         clrf    flag1   
+0011   01A4           00129         clrf    fail
+0012   1283 1303      00130         banksel 0                               ;set bank 0
+0014   0185           00131         clrf    porta                   ;clear port output latches
+0015   0186           00132         clrf    portb
+0016   0187           00133         clrf    portc   
+0017   1683           00134     bsf         status,rp0                      ;bank1
+0018   3000           00135         movlw   b'00000000'             ; set port B as output
+0019   0086           00136         movwf   trisb  
+001A   3000           00137         movlw   b'00000000' 
+001B   0085           00138         movwf   trisa                   ;set port A 0,2-5 to output
+001C   3007           00139         movlw   b'00000111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001D   009F           00140         movwf   adcon1                  ;TEMP - REQUIRED FOR A0-3 AS OUTPUT
+001E   30FB           00141         movlw   b'11111011'
+001F   0087           00142         movwf   trisc                   ;set port C 2 as output
+0020   1283 1303      00143         banksel 0                               ;set bank0
+                      00144 
+0022   2???           00145         call    init_tmr21              ;for .5 sec timer
+0023   2???           00146     call        init_uart
+0024   1606           00147         bsf             portb,4                 ;DP Leds off
+0025   2???           00148         call    clr_disp
+0026   2???           00149         call    tst_display
+0027   1686           00150         bsf             portb,5                 ;stat led off
+                      00151 
+                      00152 ;--------------------------------------------------------
+                      00153 ;       bsf             portb,6                 ;Aux O/P on
+                      00154 ;       call    wait05
+                      00155 ;       bcf             portb,6
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00156 ;*****************************************************************
+0028   3000           00157         movlw   0x00                    ;preset display intensity to max
+0029   00B0           00158         movwf   intens
+002A   2???           00159         call    set_id                  ;read the id switches
+                      00160 
+002B   2???           00161         call    init_tmr2               ;for PWM Output Currently set for 221Hz, 50% ?? see www.micro ex
+                            amples
+002C   2???           00162         call    init_tmr1               ;for no_data monitor
+                      00163 
+                      00164 
+                      00165 ;18/10 set all off
+                      00166 ;       bsf             intcon,7                ;enable all interupts
+                      00167 ;       bsf             intcon,6                ;Peripheral int enable
+                      00168 ;       bcf             pir1,rcif
+                      00169 ;       bcf     pir1,tmr2if
+                      00170 
+002D                  00171 main
+002D   180C           00172         btfsc   pir1,tmr1if             ;timer 1 flag
+002E   2???           00173         call    no_data                 ;timer was not reset by valid data in
+002F   1A24           00174         btfsc   fail,4                  ;has fail been incremented up to 0x10? (4.8 Secs)
+0030   2???           00175         call    data_fail
+0031   190B           00176         btfsc   intcon,t0if             ;TMR0 Flag, TMR started by aux output set on
+0032   2???           00177         call    clr_aux
+0033   1A8C           00178         btfsc   pir1,rcif               ;check for data in buffer
+0034   2???           00179         call    do_rcv                  ;recieved data at serial port
+0035   2???           00180         goto    main
+                      00181 
+0036                  00182 do_rcv
+0036   2???           00183         call    read_port               ;returns serial data in w #rx_data
+0037   2???           00184         call    tst_char                ;test the data in w and deal with it
+0038   018F           00185         clrf    tmr1h                   ;received any char, reset the timer
+0039   018E           00186         clrf    tmr1l
+003A   01A4           00187         clrf    fail                    ;reset Fail counter
+003B   1286           00188         bcf             portb,5                 ;stat led on
+003C   0008           00189         return
+                      00190 
+003D                  00191 read_port
+003D   1918           00192         btfsc   rcsta,ferr      ;chk for framing error
+003E   2???           00193         goto    rcv_error1
+003F   1898           00194         btfsc   rcsta,oerr      ;rcv buffer overun error
+0040   2???           00195         goto    rcv_error2
+0041   081A           00196         movfw   rcreg
+0042   0008           00197         return
+                      00198 
+0043                  00199 rcv_error1
+0043   1218           00200         bcf     rcsta,cren      ;disable rcv to clear error
+0044   1618           00201         bsf     rcsta,cren
+0045   081A           00202         movfw   rcreg
+0046   1285           00203         bcf     porta,5
+0047   0008           00204         return
+0048                  00205 rcv_error2
+0048   1218           00206         bcf     rcsta,cren      ;disable rcv to clear error
+0049   1618           00207         bsf     rcsta,cren
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+004A   081A           00208         movfw   rcreg
+004B   1285           00209         bcf     porta,5
+004C   0008           00210         return
+                      00211 
+004D                  00212 no_data
+004D   0AA4           00213         incf    fail,f
+004E   100C           00214         bcf     pir1,tmr1if
+004F   0008           00215         return
+                      00216 
+0050                  00217 data_fail
+0050   2???           00218         call    clr_disp
+0051   1686           00219         bsf             portb,5         ;led off
+0052   01A4           00220         clrf    fail
+0053   0008           00221         return
+                      00222 
+0054                  00223 clr_aux
+0054   110B           00224         bcf             intcon,t0if
+0055   0BB1           00225         decfsz  aux_off,f
+0056   0008           00226         return
+0057   1306           00227         bcf             portb,6         ;set aux o/p off
+0058   11A1           00228         bcf             flag1,aux
+0059   1683           00229         bsf             status,5
+005A   30FF           00230         movlw   b'11111111'             ;tmr 0 off
+005B   0081           00231         movwf   opt
+005C   1283           00232         bcf             status,5        
+005D   0008           00233         return
+                      00234 
+                      00235 ;***************************************************
+005E                  00236 tst_char
+005E   18A1           00237         btfsc   flag1,id
+005F   2???           00238         goto    rcv_no          ;have received board id (A/B/C), now do numbers
+                      00239 
+0060   00A5           00240         movwf   var2
+0061   09A5           00241         comf    var2,f  
+0062   0AA5           00242         incf    var2,f          ;rcvd value = complement +1
+                      00243 
+0063   3041           00244 cha     movlw   'A'                     ;Display 1
+0064   0725           00245         addwf   var2,w          ;  if =, Z will be set
+0065   1D03           00246         skpz
+0066   2???           00247         goto    chb                     ;char is not A  
+0067   1C26           00248         btfss   disp_id,0       
+0068   2???           00249         goto    chb                     ;Display is not #1
+0069   14A1           00250         bsf             flag1,id        ;Set flag, this display for read digit in
+006A   3001           00251         movlw   b'00000001'
+006B   00A8           00252         movwf   digit_id
+006C   0008           00253         return
+                      00254 
+006D   3042           00255 chb     movlw   'B'                     ;Display 2
+006E   0725           00256         addwf   var2,w          ;  if =, Z will be set
+006F   1D03           00257         skpz
+0070   2???           00258         goto    chc                     ;char is not B  
+0071   1CA6           00259         btfss   disp_id,1       
+0072   2???           00260         goto    chc                     ;Display is not #2
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0073   14A1           00261         bsf             flag1,id        ;Set flag, this display for read digit in
+0074   3001           00262         movlw   b'00000001'
+0075   00A8           00263         movwf   digit_id
+0076   0008           00264         return
+                      00265 
+0077   3043           00266 chc     movlw   'C'                     ;Display 3
+0078   0725           00267         addwf   var2,w          ;  if =, Z will be set
+0079   1D03           00268         skpz
+007A   2???           00269         goto    chx                     ;char is not C  
+007B   1D26           00270         btfss   disp_id,2       
+007C   2???           00271         goto    chz                     ;Display is not #3
+007D   14A1           00272         bsf             flag1,id        ;Set flag, this display for read digit in
+007E   3001           00273         movlw   b'00000001'
+007F   00A8           00274         movwf   digit_id
+0080   0008           00275         return
+                      00276 
+0081   3058           00277 chx     movlw   'X'                     ;
+0082   0725           00278         addwf   var2,w          
+0083   1D03           00279         skpz
+0084   2???           00280         goto    chi                     ;char is not X  
+                      00281 ;       bcf             portb,5         ;Stat Led On    4/11 moved to do_rcv
+0085   0008           00282         return
+                      00283 
+0086   3049           00284 chi     movlw   'I'                     ;Increment Intensity
+0087   0725           00285         addwf   var2,w          ;  if =, Z will be set
+0088   1D03           00286         skpz
+0089   2???           00287         goto    chd                     ;char is not C  
+                      00288 ;check if already at max  (00)
+008A   08B0           00289         tstf    intens
+008B   1903           00290         skpnz           
+008C   0008           00291         return  
+                      00292 
+008D   3020           00293         movlw   0x20
+008E   02B0           00294         subwf   intens,f
+008F   0830           00295         movfw   intens
+0090   0095           00296         movwf   ccpr1l
+0091   0008           00297         return
+                      00298 
+0092   3044           00299 chd     movlw   'D'                     ;Decrement Intensity
+0093   0725           00300         addwf   var2,w          ;  if =, Z will be set
+0094   1D03           00301         skpz
+0095   2???           00302         goto    chs                     ;char is not C  
+                      00303 
+                      00304 ;check if already min (C0)
+0096   30C0           00305         movlw   0xc0
+0097   0230           00306         subwf   intens,w
+0098   1903           00307         skpnz
+0099   0008           00308         return
+                      00309 
+009A   3020           00310         movlw   0x20
+009B   07B0           00311         addwf   intens,f
+009C   0830           00312         movfw   intens
+009D   0095           00313         movwf   ccpr1l
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+009E   0008           00314         return
+                      00315 
+009F   3053           00316 chs     movlw   'S'                     ;
+00A0   0725           00317         addwf   var2,w          
+00A1   1D03           00318         skpz
+00A2   2???           00319         goto    chz                     ;char is not X  
+00A3   1706           00320         bsf             portb,6         ;Aux O/P (Sounder) On
+00A4   15A1           00321         bsf             flag1,aux       ; set flag Aux is On, cleared by timer0
+00A5   2???           00322         call    init_tmr0       ;for turning off Aux (sounder) after 1 sec
+00A6   3010           00323         movlw   0x10
+00A7   00B1           00324         movwf   aux_off         ;setup tmr0 x 10 = 1 second
+00A8   0008           00325         return
+                      00326 
+00A9   305A           00327 chz     movlw   'Z'
+00AA   0725           00328         addwf   var2,w          ;  if =, Z will be set
+00AB   1903           00329         skpnz
+00AC   2???           00330         call    clr_disp
+00AD   0008           00331         return
+                      00332 
+00AE                  00333 rcv_no
+00AE   00A3           00334         movwf   rx_data         ;save it
+00AF   0828           00335         movfw   digit_id
+00B0   0627           00336         xorwf   board_id,w      ;check if board id bits = current digit read in
+00B1   1903           00337         skpnz
+00B2   2???           00338         goto    disp_no
+00B3   1003           00339         clrc                            ;make sure carry is clear so it does't get rotated into digit_id
+00B4   0DA8           00340         rlf             digit_id,f      ;shift digit id bit left for next char in
+00B5   0008           00341         return                          ;digit is not for this display
+                      00342 
+00B6                  00343 disp_no                 
+                      00344 ;display value in rx_data bits 0 - 3 (bcd value)
+                      00345 ;       bcf             portb,5                 ;Stat Led On.4/11 delete, is in main loop.
+00B6   1223           00346         bcf             rx_data,4
+00B7   12A3           00347         bcf             rx_data,5               ;Clear ASCII high bits
+00B8   0823           00348         movfw   rx_data
+00B9   00A9           00349         movwf   curr_no                 ;save current displayed no. - for corner led displays (disp_cnr)
+                                    
+00BA   0806           00350         movfw   portb
+00BB   39F0           00351         andlw   0xf0                    ;Clear low bits
+00BC   0623           00352         xorwf   rx_data,w               ;add display bits 0-3 to existing port values in bits 4-7
+00BD   0086           00353         movwf   portb                   ;display data to port
+00BE   1206           00354         bcf             portb,4                 ;DP leds on for any digit
+00BF   10A1           00355         bcf             flag1,id        
+00C0   01A8           00356         clrf    digit_id
+00C1   2???           00357         call    disp_cnr        
+00C2   0008           00358         return
+                      00359 
+00C3                  00360 clr_disp
+00C3   0806           00361         movfw   portb
+00C4   00A2           00362         movwf   temp
+00C5   1422           00363         bsf             temp,0
+00C6   14A2           00364         bsf             temp,1
+00C7   1522           00365         bsf             temp,2
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C8   15A2           00366         bsf             temp,3          ;set bits 0-3 high (= display blank)
+00C9   1622           00367         bsf             temp,4          ;DP bit
+00CA   0822           00368         movfw   temp            
+00CB   0086           00369         movwf   portb
+00CC   0185           00370         clrf    porta           ;clear corner leds              
+00CD   0008           00371         return
+                      00372 
+00CE                  00373 disp_cnr
+                      00374         ;turn on the 6 additional display leds as required, use value in curr_no to work out correct com
+                            bination
+00CE   08A9           00375         tstf    curr_no
+00CF   1903           00376         skpnz
+00D0   2???           00377         goto    cnr0
+00D1   03A9           00378         decf    curr_no,f
+00D2   08A9           00379         tstf    curr_no
+00D3   1903           00380         skpnz
+00D4   2???           00381         goto    cnr1
+00D5   03A9           00382         decf    curr_no,f
+00D6   08A9           00383         tstf    curr_no
+00D7   1903           00384         skpnz
+00D8   2???           00385         goto    cnr2
+00D9   03A9           00386         decf    curr_no,f
+00DA   08A9           00387         tstf    curr_no
+00DB   1903           00388         skpnz
+00DC   2???           00389         goto    cnr3
+00DD   03A9           00390         decf    curr_no,f
+00DE   08A9           00391         tstf    curr_no
+00DF   1903           00392         skpnz
+00E0   2???           00393         goto    cnr4
+00E1   03A9           00394         decf    curr_no,f
+00E2   08A9           00395         tstf    curr_no
+00E3   1903           00396         skpnz
+00E4   2???           00397         goto    cnr5
+00E5   03A9           00398         decf    curr_no,f
+00E6   08A9           00399         tstf    curr_no
+00E7   1903           00400         skpnz
+00E8   2???           00401         goto    cnr6
+00E9   03A9           00402         decf    curr_no,f
+00EA   08A9           00403         tstf    curr_no
+00EB   1903           00404         skpnz
+00EC   2???           00405         goto    cnr7
+00ED   03A9           00406         decf    curr_no,f
+00EE   08A9           00407         tstf    curr_no
+00EF   1903           00408         skpnz
+00F0   2???           00409         goto    cnr8
+00F1   03A9           00410         decf    curr_no,f
+00F2   08A9           00411         tstf    curr_no
+00F3   1903           00412         skpnz
+00F4   2???           00413         goto    cnr9
+00F5   0185           00414         clrf    porta                   ;not 0 - 9 (is 0x0F) so all leds off
+00F6   0008           00415         return                                  
+                      00416 
+00F7                  00417 cnr0
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00F7   303F           00418         movlw   b'00111111'
+00F8   0085           00419         movwf   porta
+00F9   0008           00420         return
+00FA                  00421 cnr1
+00FA   3007           00422         movlw   b'00000111'
+00FB   0085           00423         movwf   porta
+00FC   0008           00424         return
+00FD                  00425 cnr2
+00FD   303F           00426         movlw   b'00111111'
+00FE   0085           00427         movwf   porta
+00FF   0008           00428         return
+0100                  00429 cnr3
+0100   303F           00430         movlw   b'00111111'
+0101   0085           00431         movwf   porta
+0102   0008           00432         return
+0103                  00433 cnr4
+0103   3037           00434         movlw   b'00110111'
+0104   0085           00435         movwf   porta
+0105   0008           00436         return
+0106                  00437 cnr5
+0106   303F           00438         movlw   b'00111111'
+0107   0085           00439         movwf   porta
+0108   0008           00440         return
+0109                  00441 cnr6
+0109   303F           00442         movlw   b'00111111'
+010A   0085           00443         movwf   porta
+010B   0008           00444         return
+010C                  00445 cnr7
+010C   3027           00446         movlw   b'00100111'
+010D   0085           00447         movwf   porta
+010E   0008           00448         return
+010F                  00449 cnr8
+010F   303F           00450         movlw   b'00111111'
+0110   0085           00451         movwf   porta
+0111   0008           00452         return
+0112                  00453 cnr9
+0112   3037           00454         movlw   b'00110111'
+0113   0085           00455         movwf   porta
+0114   0008           00456         return
+                      00457 
+                      00458 
+0115                  00459 set_id
+                      00460                 ;read id bits and set display id, board id
+0115   3001           00461         movlw   01
+0116   00A7           00462         movwf   board_id                ;preset to board 1
+0117   0807           00463         movfw   portc
+0118   00A2           00464         movwf   temp
+0119   13A2           00465         bcf             temp,7
+011A   1322           00466         bcf             temp,6
+011B   1122           00467         bcf             temp,2                  ;clear the port bits not used here
+011C   08A2           00468         tstf    temp
+011D   1903           00469         skpnz                   
+011E   2???           00470         goto    all_zero                ;all zero, not valid
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+011F   18A2           00471         btfsc   temp,1          
+0120   2???           00472         goto    id1                     
+0121   3001           00473         movlw   b'00000001'             ;id 01, so display = 1
+0122   00A6           00474         movwf   disp_id
+0123   2???           00475         goto    set_board
+                      00476 
+0124   1822           00477 id1     btfsc   temp,0
+0125   2???           00478         goto    id2     
+0126   3002           00479         movlw   b'00000010'             ;id = x0, so display = 2
+0127   00A6           00480         movwf   disp_id
+0128   2???           00481         goto    set_board
+                      00482 
+0129   3004           00483 id2     movlw   b'00000100'             ;set id to display 3
+012A   00A6           00484         movwf   disp_id
+012B                  00485 set_board
+012B   1022           00486         bcf             temp,0
+012C   10A2           00487         bcf             temp,1
+012D   0CA2           00488         rrf     temp,f                  ;move id bits 3-5 to 0-3
+012E   0CA2           00489         rrf             temp,f
+012F   0CA2           00490         rrf             temp,f
+0130                  00491 nxt_id  
+0130   08A2           00492         tstf    temp    
+0131   1903           00493         skpnz                   
+0132   2???           00494         goto    id_done                 ;       
+0133   03A2           00495         decf    temp,f
+0134   0DA7           00496         rlf             board_id,f
+0135   2???           00497         goto    nxt_id
+0136                  00498 id_done
+0136   0008           00499         return
+                      00500 
+0137                  00501 all_zero                                ;ID all zero
+0137   2???           00502         call    test_count      ;display 0 to 8
+0138   1686           00503 az1     bsf             portb,5         ;then stop and flash stat led
+0139   2???           00504         call    wait05
+013A   1286           00505         bcf             portb,5
+013B   2???           00506         call    wait05
+013C   2???           00507         goto    az1
+                      00508 
+                      00509 
+013D                  00510 tst_display
+                      00511         ;Get board ID, dipslay corresponding number.
+                      00512         ;  eg if board ID = '00000100', display "3"
+013D   0807           00513         movfw   portc
+013E   00A2           00514         movwf   temp
+013F   3038           00515         movlw   b'00111000'
+0140   05A2           00516         andwf   temp,f                  ;clear other port bits
+0141   0CA2           00517         rrf             temp,f
+0142   0CA2           00518         rrf             temp,f
+0143   0CA2           00519         rrf             temp,f                  ;move bits to 1 -3
+0144   0AA2           00520         incf    temp,f                  ;add 1 so display 000 displays as "1" etc.
+0145   0822           00521         movfw   temp
+0146   00A3           00522         movwf   rx_data
+0147   2???           00523         call    disp_no
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0148   2???           00524         call    wait05                  ;delay 1/2 sec
+0149   2???           00525         call    clr_disp
+014A   0008           00526         return
+                      00527 
+                      00528 
+014B                  00529 wait05  ;0.5 sec delay => timer2 x value in temp
+                      00530 ;       movlw   0x20    
+014B   3080           00531         movlw   0x80            ;temp changed
+014C   00A2           00532         movwf   temp
+014D   2???           00533 w1      call    wait_t2
+014E   0BA2           00534         decfsz  temp,f
+014F   2???           00535         goto    w1      
+0150   0008           00536         return
+                      00537 
+0151                  00538 wait_t2
+0151   108C           00539         bcf             pir1,1  ;clear flag  tmr2 = 65536uS (value of temp)
+0152   1C8C           00540 d1      btfss   pir1,1
+0153   2???           00541         goto    d1
+0154   108C           00542         bcf             pir1,1
+0155   0008           00543         return
+                      00544 
+0156                  00545 do_irq
+0156   1421           00546         bsf             flag1,tim_fl    
+0157   100C           00547         bcf             pir1,0          ; clr int flag
+0158   0009           00548         retfie  ;return
+                      00549 
+0159                  00550 init_tmr21
+0159   307E           00551         movlw   b'01111110'             ;prescale16, postscale 16, tmr on
+015A   0092           00552         movwf   t2con                   
+015B   3039           00553         movlw   0x39                    ; = 14.6ms to TMR2IF flag
+015C   1683           00554         bsf             status,5
+015D   0092           00555         movwf   pr2
+015E   1283           00556         bcf             status,5
+015F   0008           00557         return
+                      00558 
+0160                  00559 init_tmr2       ;Timer used to dim display. Generates PWM out at RC2.Duty cycle is 4.5mS, Period set by 
+                            CCPR1l value
+0160   3006           00560         movlw   b'00000110'             ;prescale16, tmr on
+0161   0092           00561         movwf   t2con                   
+0162   30FF           00562         movlw   0xff                    ; 
+0163   1683           00563         bsf             status,5
+0164   0092           00564         movwf   pr2
+0165   1283           00565         bcf             status,5
+                      00566 ;       movlw   b'01111101'
+0166   0830           00567         movfw   intens
+0167   0095           00568         movwf   ccpr1l
+0168   300C           00569         movlw   b'00001100'
+0169   0097           00570         movwf   ccp1con                 ;enable pwm ???
+016A   0008           00571         return
+                      00572 
+016B                  00573 init_tmr1
+016B   3021           00574         movlw   b'00100001'             ;tmr on, int clk, prescale 4
+016C   0090           00575         movwf   t1con                   ;Time = 0.3 secs to TMR1IF
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+016D   0008           00576         return
+                      00577 
+016E                  00578 init_tmr0
+016E   0181           00579         clrf    tmr0                    ;clear counter
+016F   1683           00580         bsf             status,5
+0170   30C7           00581         movlw   b'11000111'             ;tmr en, prescale 256
+0171   0081           00582         movwf   opt
+0172   1283           00583         bcf             status,5
+0173   0008           00584         return
+0174                  00585 init_uart
+0174   1683           00586         bsf      status,5
+0175   302E           00587         movlw    d'46'          ;set 1200 baud
+0176   0099           00588         movwf    0x19                        
+0177   3020           00589         movlw    b'00100000'
+0178   0098           00590         movwf    0x18           ;enable uart xmit, 8bit, async              
+0179   1283           00591         bcf      status,5
+017A   3090           00592         movlw    b'10010000'
+017B   0098           00593         movwf    0x18           ;enable rx/tx port
+017C   0008           00594         return
+                      00595 
+017D                  00596 test_count                                      ;display 1 - 8
+017D   2???           00597         call    wait05
+017E   01A3           00598         clrf    rx_data
+017F   2???           00599         call    disp_no
+0180   2???           00600         call    wait05
+0181   0AA3           00601         incf    rx_data,f
+0182   2???           00602         call    disp_no
+0183   2???           00603         call    wait05
+0184   0AA3           00604         incf    rx_data,f
+0185   2???           00605         call    disp_no
+0186   2???           00606         call    wait05
+0187   0AA3           00607         incf    rx_data,f
+0188   2???           00608         call    disp_no
+0189   2???           00609         call    wait05
+018A   0AA3           00610         incf    rx_data,f
+018B   2???           00611         call    disp_no
+018C   2???           00612         call    wait05
+018D   0AA3           00613         incf    rx_data,f
+018E   2???           00614         call    disp_no
+018F   2???           00615         call    wait05
+0190   0AA3           00616         incf    rx_data,f
+0191   2???           00617         call    disp_no
+0192   2???           00618         call    wait05
+0193   0AA3           00619         incf    rx_data,f
+0194   2???           00620         call    disp_no
+0195   2???           00621         call    wait05
+0196   0AA3           00622         incf    rx_data,f
+0197   2???           00623         call    disp_no
+0198   2???           00624         call    wait05
+0199   2???           00625         call    clr_disp
+                      00626 ;TEMP
+019A   2???           00627         goto    test_count
+                      00628 
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+019B   0008           00629         return  
+                      00630 
+3FF1                  00631         end
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRES                             0000001E
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CKE                               00000006
+CKP                               00000004
+CREN                              00000004
+CSRC                              00000007
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+D_A                               00000005
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+I2C_STOP                          00000004
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PMADR                             0000010D
+PMADRH                            0000010F
+PMCON1                            0000018C
+PMDATA                            0000010C
+PMDATH                            0000010E
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+R                                 00000002
+RBIE                              00000003
+RBIF                              00000000
+RC8_9                             00000006
+RC9                               00000006
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RCD8                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+R_W                               00000002
+S                                 00000003
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISB                             00000086
+TRISC                             00000087
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+WCOL                              00000007
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_CP_ALL                           00003FEF
+_CP_OFF                           00003FFF
+_HS_OSC                           00003FFE
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F73                           00000001
+adcon0                            0000001F
+adcon1                            0000009F
+adres                             0000001E
+all_zero                          00000137
+aux                               00000003
+aux_off                           00000031
+az1                               00000138
+board_id                          00000027
+ccp1con                           00000017
+ccpr1l                            00000015
+cha                               00000063
+chb                               0000006D
+chc                               00000077
+chd                               00000092
+chi                               00000086
+chs                               0000009F
+chx                               00000081
+chz                               000000A9
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+clr_aux                           00000054
+clr_disp                          000000C3
+cnr0                              000000F7
+cnr1                              000000FA
+cnr2                              000000FD
+cnr3                              00000100
+cnr4                              00000103
+cnr5                              00000106
+cnr6                              00000109
+cnr7                              0000010C
+cnr8                              0000010F
+cnr9                              00000112
+cren                              00000004
+curr_no                           00000029
+d1                                00000152
+data_fail                         00000050
+digit_id                          00000028
+dim                               00000002
+disp_cnr                          000000CE
+disp_id                           00000026
+disp_no                           000000B6
+do_irq                            00000156
+do_rcv                            00000036
+fail                              00000024
+ferr                              00000002
+flag1                             00000021
+fsr                               00000004
+id                                00000001
+id1                               00000124
+id2                               00000129
+id_done                           00000136
+indf                              00000000
+init_tmr0                         0000016E
+init_tmr1                         0000016B
+init_tmr2                         00000160
+init_tmr21                        00000159
+init_uart                         00000174
+intcon                            0000000B
+intens                            00000030
+main                              0000002D
+no_data                           0000004D
+nxt_id                            00000130
+oerr                              00000001
+opt                               00000001
+pclath                            0000000A
+pie1                              0000000C
+pir1                              0000000C
+porta                             00000005
+portb                             00000006
+portc                             00000007
+pr2                               00000012
+rcif                              00000005
+rcreg                             0000001A
+MPASM  5.35                    CL_DISPLAY.ASM   11-4-2015  19:39:40         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+rcsta                             00000018
+rcv_error1                        00000043
+rcv_error2                        00000048
+rcv_no                            000000AE
+read_port                         0000003D
+rp0                               00000005
+rx_data                           00000023
+scratch                           00000020
+set_board                         0000012B
+set_id                            00000115
+spbrg                             00000009
+start                             00000010
+status                            00000003
+t0if                              00000002
+t1con                             00000010
+t2con                             00000012
+t2flag                            0000000C
+temp                              00000022
+test_count                        0000017D
+tim_fl                            00000000
+tmr0                              00000001
+tmr1h                             0000000F
+tmr1if                            00000000
+tmr1l                             0000000E
+tmr2                              00000011
+tmr2if                            00000001
+trisa                             00000005
+trisb                             00000006
+trisc                             00000007
+tst_char                          0000005E
+tst_display                       0000013D
+txreg                             00000019
+txsta                             00000018
+var2                              00000025
+w1                                0000014D
+wait05                            0000014B
+wait_t2                           00000151
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     1 reported,     0 suppressed
+
+

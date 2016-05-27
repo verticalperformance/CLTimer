@@ -1,0 +1,892 @@
+; source code for Digital Display, Control Line timing sytem
+; 
+;Pulse timing assumes xtal at 4.00Mhz
+
+;History
+;
+;Jul 15 Copied from C:\PicJobs\Digital_Clk4
+;
+Working on setid
+
+
+
+
+;                   ^^^^^^^^^^^^^^^^^^^^^^^^
+
+;	list      p=16c73  
+;	#include <p16c73.inc> 
+	list      p=16f73           ; list directive to define processor
+	#include <p16F73.inc>        ; processor specific variable definitions
+
+	__CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
+
+
+scratch		equ	0x20
+
+; variables
+
+flag1		equ   scratch+0x1
+temp		equ	scratch+0x2
+rx_data		equ	scratch+0x3	
+fail		equ	scratch+0x4
+var2		equ	scratch+0x05
+d_no		equ 	scratch+0x06
+chr_no		equ 	scratch+0x07
+status_temp	equ 	scratch+0x08
+pclath_temp	equ 	scratch+0x09
+led_sel		equ 	scratch+0x10	:temp val for corner led control
+;	equ 	scratch+0x11	
+;	equ 	scratch+0x12
+;	equ 	scratch+0x13
+;	equ 	scratch+0x14
+w_temp		equ		scratch+0x15
+;
+buffin		equ	scratch+0x16
+buffout		equ	scratch+0x17
+datbuff		equ	scratch+0x20	;don't move
+;** Don't use area after here (reserved for data in buffer)
+	
+
+; constants
+indf	equ 0
+fsr		equ 4
+status	equ 3	; status register, also at 0x83
+porta	equ	5
+portb	equ	6
+portc	equ	7
+trisa	equ	0x5	; port ddr - in bank 1 (=85)
+trisb	equ	0x6
+trisc	equ	0x7
+tmr0	equ	1
+opt		equ	1	;TMR0 option reg - in bank 1 (=81)
+tmr1l	equ	0x0e
+tmr1h	equ	0x0f
+t1con	equ	0x10
+t2con	equ	0x12
+t2flag	equ	0x0c
+tmr2	equ	0x11
+pr2		equ	0x12	; bank1 (=92)
+adcon0	equ	0x1f
+adres	equ	0x1e
+txreg	equ	0x19
+pir1	equ	0x0c
+pclath	equ	0x0a
+txsta	equ 0x18		;bank1 =98
+rcsta	equ	0x18
+rcreg	equ	0x1a
+intcon	equ	0x0b
+pie1	equ	0x0c	;bank1 8c
+adcon1	equ 0x9f
+spbrg		equ 0x09	;bank1 {=99}
+
+; Bit Definitions
+
+
+rp0		equ 5	;register page
+ferr	equ	2	;rx framing error
+oerr	equ	1	; rx overun
+cren	equ	4	; uart rx en
+rcif	equ	5	; rvcd data flag
+latch 	equ  3	;4514 inhibit (latch)
+tmr2if	equ 1	
+
+;flag1 bits
+tim_fl	equ	0	
+rcv		equ	1
+disp	equ	2
+digit	equ	3
+tmp		equ	4
+id		equ	5	
+	
+
+;************************************************************
+; port assignment
+
+;	RA0 = D1 Led
+;	RA1 = D2 Led
+;	RA2 = D3 Led
+;	RA3 = D4 Led
+;	RA4 = D5 Led
+;	RA5 = D6 Led
+;	RB0-3 = BCD value of display digit
+;	RB4 = DP Display 0 = On
+;	RB5 = Stat	0 = On
+;	RB6 = aux	1 = On
+;	RC0 = ID1
+;	RC1 = ID2
+;	RC3 = ID3
+;	RC4 = ID4
+;	RC5 = ID5
+
+
+;	RC7 = Rx Data In
+
+;###########################################################################
+; begin
+	org	0
+
+	goto	start
+	org 4
+	goto do_irq
+
+	org	10	
+start
+
+
+	clrf	flag1	
+	clrf	fail
+	banksel	0		;set bank 0
+	clrf	porta		;clear port output latches
+	clrf	portb
+	clrf	portc	
+    bsf	status,rp0 	;bank1
+	movlw   b'00000000'	; set port B as output
+   	movwf	trisb  
+	movlw	b'00000000' 
+	movwf	trisa		;set port A 0 - 7 to output
+	movlw	b'00000111'
+	movwf	adcon1		;TEMP - REQUIRED FOR A0-3 AS OUTPUT
+	movlw	b'11100011'
+	movwf	trisc		;set port C 0,1,3,4,5 as input
+	banksel	0		;set bank0
+
+;	call 	init_ad		RESET RA0 (TRISA)
+	call	init_tmr21	;for .5 sec timer
+	call	wait05		;delay 1/2 sec
+	bsf	portb,5		;stat led off
+
+	call	clr_disp
+	call	tst_display2	;show 0 - 3 on each display
+	call	init_tmr2	;for no_data monitor
+	call 	init_uart
+	call	init_tmr1
+
+	bsf		intcon,7	;enable all interupts
+	bsf		intcon,6	;Peripheral int enable
+	bcf		pir1,rcif
+
+	bcf		porta,2		;TEMP
+	bcf 	pir1,tmr2if
+;#
+	clrf	buffin
+	clrf	buffout
+
+	call	setid
+
+main
+	btfsc	flag1,tim_fl	
+	call 	pollmon		;flag got set by timer1 interupt
+	btfsc pir1,tmr2if		;timer 2 flag
+	call	no_data		;timer was not reset by valid data in
+	btfsc	fail,6		;has fail been incremented up to 0x40? (4 Secs){8/7/08}
+	call	data_fail
+	btfsc	pir1,rcif		;check for data in buffer
+	call	do_rcv		;recieved data at serial port
+	goto 	main
+
+;*** Try without using buffer
+
+;do_rcv
+;	movlw	0x40			;address of datbuff
+;	addwf	buffin,w
+;	movwf	fsr			;point to current buffer input
+;	call	read_port 		;returns serial data in w #rx_data
+;	movwf	indf			;save in buffer
+;	incf	buffin,f
+;	btfsc	pir1,rcif		;check for more data in buffer
+;	goto	do_rcv
+
+;now handle data in buffer
+;nxt_in	
+;	movlw	0x40			;address of datbuff
+;	addwf	buffout,w
+;	movwf	fsr			;point to current buffer output	
+;	incf	buffout,f		;increment for next time
+;
+;	movfw	indf
+;	call	tst_char		;test the data in w and deal with it
+
+;end_rcv
+;	btfsc	pir1,rcif		;check for more data in buffer
+;	goto	do_rcv	
+
+;test if buffout=buffin (all data dealt with)
+;	movfw	buffin
+;	subwf	buffout,w
+;	skpz
+;	goto	nxt_in
+;	clrf	buffin
+;	clrf	buffout
+;	return
+
+read_port
+	btfsc	rcsta,ferr	;chk for framing error
+	goto	rcv_error1
+	btfsc	rcsta,oerr	;rcv buffer overun error
+	goto	rcv_error2
+	movfw	rcreg
+	return
+
+rcv_error1
+	bcf	rcsta,cren	;disable rcv to clear error
+	bsf	rcsta,cren
+	movfw	rcreg
+	bcf	porta,5
+	return
+rcv_error2
+	bcf	rcsta,cren	;disable rcv to clear error
+	bsf	rcsta,cren
+	movfw	rcreg
+	bcf	porta,5
+	return
+
+pollmon
+	;Called here by Timer 1 interupt - every 16? seconds
+	;turn the fan off, clear the display 
+	bcf	flag1,tim_fl
+	bcf	porta,2
+	call	clr_disp	;in case of error
+	return
+
+no_data
+	incf	fail,f
+	bcf 	pir1,tmr2if
+	return
+
+data_fail
+	call	clr_disp
+	bcf	porta,5		;led off
+	return
+
+clr_disp
+	;no data in, clear the displays
+	call	disp_bl			;data to blank display
+	clrf	dig_sel
+	call	wr_disp
+	movlw	0x10
+	movwf	dig_sel
+	call	wr_disp
+	movlw	0x20
+	movwf	dig_sel
+	call	wr_disp
+	movlw	0x30
+	movwf	dig_sel
+	call	wr_disp	
+	clrf	fail
+	bcf	porta,5			;led off
+	bsf	porta,4			;DP off
+	bcf	porta,0			;trig output off ){8/7/08}
+	return
+;***************************************************
+tst_char
+	movwf	var2
+	comf	var2,f	
+	incf	var2,f		;rcvd value = complement +1
+
+;#### Not sure if needed...
+	movlw	'I'			;Pylon ID char
+	addwf	var2,w		;  if =, Z will be set
+	skpnz
+	goto	chx			; Rcvd I, clear flags then ignore
+
+	movlw	'J'			;Pylon ID char
+	addwf	var2,w		;  if =, Z will be set
+	skpnz
+	goto	chx			; Rcvd J, clear flags then ignore
+
+	movlw	'K'			;Pylon ID char
+	addwf	var2,w		;  if =, Z will be set
+	skpnz
+	goto	chx			; Rcvd K, clear flags then ignore
+
+;#### to here
+
+chl	movlw	'L'			;Clock ID char
+	addwf	var2,w		;  if =, Z will be set
+	skpz
+	goto	chid			
+	bsf		flag1,id
+	goto	chz
+
+chid	btfss	flag1,id	;if id not set, ignore any other
+	goto	chz
+
+	movlw	'X'
+	addwf	var2,w		;  if =, Z will be set
+	skpz
+	goto	cha		
+	bcf	flag1,id			;received X (Used while idle from PC, just clear flags and timeout)
+	goto chz
+
+cha	movlw	'A'
+	addwf	var2,w		;  if =, Z will be set
+	skpz
+	goto	chb		
+	clrf	dig_sel		;received A - display #1	
+	bsf	flag1,disp
+	goto	chz
+
+chb movlw	'B'
+	addwf	var2,w		
+	skpz
+	goto	chc				
+	movlw 	0x10			;received B
+	movwf	dig_sel
+	bsf	flag1,disp
+	goto	chz
+
+chc movlw	'C'
+	addwf	var2,w		
+	skpz
+	goto	chd				
+	movlw	0x20			;received C
+	movwf	dig_sel
+	bsf	flag1,disp
+	goto	chz
+
+chd movlw	'D'
+	addwf	var2,w		
+	skpz
+	goto	ch0			
+	movlw	0x30			;received D - display #4
+	movwf	dig_sel
+	bsf	flag1,disp
+	goto	chz
+
+ch0	btfss	flag1,disp		;test if received a char A...D first
+	goto	chz
+
+	movlw	'0'
+	addwf	var2,w		
+	skpz
+	goto	ch1			
+	call	disp_0
+	movlw	0
+	iorwf	dig_sel,w		;{8/7/08}added, if display 1 = 0, set trig (porta,0)
+	skpnz
+	bsf	porta,0	
+	goto	chy
+
+ch1 	movlw	'1'
+	addwf	var2,w		
+	skpz
+	goto	ch2			
+	call	disp_1		
+	goto	chy
+
+ch2 	movlw	'2'
+	addwf	var2,w		
+	skpz
+	goto	ch3			
+	call	disp_2			
+	goto	chy
+ch3 	movlw	'3'
+	addwf	var2,w		
+	skpz
+	goto	ch4			
+	call	disp_3		
+	goto	chy
+ch4 	movlw	'4'
+	addwf	var2,w		
+	skpz
+	goto	ch5			
+	call	disp_4		
+	goto	chy
+ch5 	movlw	'5'
+	addwf	var2,w		
+	skpz
+	goto	ch6			
+	call	disp_5		
+	goto	chy
+ch6 	movlw	'6'
+	addwf	var2,w		
+	skpz
+	goto	ch7			
+	call	disp_6		
+	goto	chy
+ch7 	movlw	'7'
+	addwf	var2,w		
+	skpz
+	goto	ch8			
+	call	disp_7		
+	goto	chy
+ch8 	movlw	'8'
+	addwf	var2,w		
+	skpz
+	goto	ch9			
+	call	disp_8			
+	goto	chy
+ch9 	movlw	'9'
+	addwf	var2,w		
+	skpz
+	goto	chq			
+	call	disp_9		
+	goto	chy
+chq 	movlw	'Q'
+	addwf	var2,w		
+	skpz
+	goto	che			
+	bcf	porta,4		;Decimal point on
+	goto	chz
+
+che 	movlw	'E'
+	addwf	var2,w		
+	skpz
+	goto	chz		
+	call	disp_bl			;received E - blank
+	bsf	porta,4			;clr DP
+
+
+chy 		;Have data to display
+	call	wr_disp			;have data to display
+	bcf	flag1,digit
+	bcf	flag1,disp
+	bcf	flag1,id
+	bsf	porta,2			;turn the fan on
+	clrf	tmr1l
+	clrf	tmr1h			;reset timer1 (stop timeout while using display) 		
+
+chz
+	clrf	tmr2		;received any char, reset the timer
+	bsf		porta,5		;Led On
+	clrf	fail		;reset Fail counter
+	return
+
+
+chx		;received some other char (From polling cut judges)
+	bcf	flag1,digit
+	bcf	flag1,disp
+	clrf	tmr2		;received any char, reset the timer
+	bsf	porta,5		;Led On
+	clrf	fail		;reset Fail counter
+	return
+
+setid	;read id bits and set display id, board id
+	movlw	01
+	movwf	boardid		;preset to board 1
+
+	movfw	portc
+
+
+	goto	??		; bits 0,1,3,4,5 all 0, invalid
+	btfsc	temp,1
+	goto	id1		;id 1 = 1
+	movlw	b'00000001'
+	movwf	dispid
+	goto	iddone
+
+id1	btfsc	temp,2
+	goto	id2		;id 2 = 1
+	movlw	b'00000010'
+	movwf	dispid
+	goto	iddone
+
+id2	movlw	b'00000100'	;setid to display 3
+	movwf	dispid
+	bcf	temp,1
+	bcf	temp,2
+	rrf 	temp,f		move id bits 3-5 to 0-3
+	rrf	temp,f
+	rrf	temp,f
+	tstf
+	skpnz			
+	goto	iddone		id = 0, use board id = 1	
+	decf	temp,f
+	skpnz
+	rlf	boardid,f
+
+
+iddone
+	
+
+;******************************************************QQ
+
+tst_display2
+	call 	disp_0		;load dig_dat1..4 (with "0")
+	movlw	0
+	movwf	dig_sel		;display #1
+	call 	wr_disp
+	call	wait05		;delay 1/2 sec
+	call 	disp_1		;display a "1"
+	clrf	dig_sel		
+	call 	wr_disp
+	call	wait05		
+	call 	disp_2		;display a "2"
+	clrf	dig_sel		
+	call 	wr_disp
+	call	wait05		
+	call 	disp_3		;display a "3"
+	clrf	dig_sel		
+	call 	wr_disp
+	call	wait05
+	call 	disp_bl		;blank the display
+	clrf	dig_sel		
+	call 	wr_disp
+	call	wait05		
+
+	call 	disp_0	
+	movlw	0x10		
+	movwf	dig_sel		;display #2
+	call	wr_disp
+	call	wait05
+	call 	disp_1	
+	movlw	0x10		
+	movwf	dig_sel	
+	call	wr_disp
+	call	wait05
+	call 	disp_2		
+	movlw	0x10		
+	movwf	dig_sel		
+	call	wr_disp
+	call	wait05
+	call 	disp_3		
+	movlw	0x10		
+	movwf	dig_sel		
+	call	wr_disp
+	call	wait05
+	call 	disp_bl
+	movlw	0x10		
+	movwf	dig_sel	
+	call 	wr_disp
+	call	wait05	
+
+	call 	disp_0	
+	movlw	0x20		
+	movwf	dig_sel		;display #3
+	call	wr_disp
+	call	wait05
+	call 	disp_1		
+	movlw	0x20		
+	movwf	dig_sel		
+	call	wr_disp
+	call	wait05
+	call 	disp_2		
+	movlw	0x20		
+	movwf	dig_sel		
+	call	wr_disp
+	call	wait05
+	call 	disp_3		
+	movlw	0x20		
+	movwf	dig_sel	
+	call	wr_disp
+	call	wait05
+	call 	disp_bl
+	movlw	0x20		
+	movwf	dig_sel	
+	call 	wr_disp
+	call	wait05	
+
+	call 	disp_0		
+	movlw	0x30		
+	movwf	dig_sel		;display #4
+	call	wr_disp
+	call	wait05
+	call 	disp_1		
+	movlw	0x30		
+	movwf	dig_sel	
+	call	wr_disp
+	call	wait05
+	call 	disp_2	
+	movlw	0x30		
+	movwf	dig_sel	
+	call	wr_disp
+	call	wait05
+	call 	disp_3	
+	movlw	0x30		
+	movwf	dig_sel
+	call	wr_disp		
+	call	wait05
+	call 	disp_bl
+	movlw	0x30		
+	movwf	dig_sel		
+	call 	wr_disp
+	bcf		porta,4		;DP on
+	call	wait05
+	bsf		porta,4		;DP off
+
+	return
+
+wr_disp
+;requires dig_sel = display # (4514 data in), 0 = D1, 10 = D2, 20 = D3, 30 = D4
+;         dig_dat1..4 = led state
+
+	movfw	dig_sel
+	movwf	portc				;leds 1 - 8
+	movfw	dig_dat1
+	movwf	portb
+	bcf		porta,latch
+	bsf		porta,latch		;latch data
+
+	movlw	04
+	addwf	dig_sel,w
+	movwf	dig_sel
+	movwf	portc				;leds 9 - 16
+	movfw	dig_dat2
+	movwf	portb
+	bcf		porta,latch
+	bsf		porta,latch		;latch data
+
+	movlw	04
+	addwf	dig_sel,w
+	movwf	dig_sel
+	movwf	portc				;leds 17 - 24
+	movfw	dig_dat3
+	movwf	portb
+	bcf		porta,latch
+	bsf		porta,latch		;latch data
+
+	movlw	04
+	addwf	dig_sel,w
+	movwf	dig_sel
+	movwf	portc				;leds 25 - 28
+	movfw	dig_dat4
+	movwf	portb
+	bcf		porta,latch
+	bsf		porta,latch		;latch data
+	return
+
+wait05	;0.5 sec delay => timer2 x value in temp
+	movlw	0x20	
+	movwf	temp
+w1	call 	wait_t2
+	decfsz 	temp,f
+	goto	w1	
+	bcf		flag1,tmp
+	return
+
+
+wait_t2
+	bcf		pir1,1	;clear flag  tmr2 = 65536uS (value of temp)
+d1	btfss	pir1,1
+	goto	d1
+	bcf		pir1,1
+	return
+
+wait_1ms
+	bcf		pir1,1
+  	bsf		status,rp0 	;bank1
+	movlw 	0x39		;3/5 WAS 38
+	movwf	pr2			;timer2 period reg
+	banksel	0
+b1	btfss	pir1,1
+	goto	b1
+	bcf		pir1,1
+	return
+
+	
+;*** a/d routines  ***
+
+get_ad1
+	movlw	b'01001001'	;a/d on, ch1
+	movwf	adcon0
+	call 	delay1		;setup delay
+	bsf		adcon0,2	;enable a/d
+	goto	wait_ad
+
+get_ad0  ;** return a/d result in w
+	movlw	b'01000001'	;a/d on, ch0
+	movwf	adcon0
+	call 	delay1		;setup delay
+	bsf		adcon0,2	;enable a/d
+wait_ad
+	btfsc	adcon0,2	; wait for done bit clear
+	goto	wait_ad
+read_ad
+	movf	adres,w
+	return			;done
+;**********************************************************
+;**************************************************************
+init_uart
+	bsf	status,5
+	movlw	d'51'		;was 22 for 2400 baud
+	movwf	0x19		;set baud rate 1200
+	movlw	b'00100000'
+	movwf	0x18		;enable uart xmit, 8bit, async	
+	bcf	status,5
+	movlw	b'10010000'
+	movwf	0x18		;enable rx/tx port
+	return
+
+init_ad
+	bsf		status,5
+	movlw	b'00000101'	;sel ch 0,1 vref ch3
+	movwf	0x1f		; =9f, adcon1
+	bcf		status,5
+	clrf	adres
+	return
+
+init_tmr1
+;#	movlw	b'00101111'	;timer 1, prescale 4, Ext clk
+	movlw	b'00111111'	;timer 1, prescale 8, Ext clk
+;	movlw	b'00100101'	;timer 1, prescale 4, INT clk
+	movwf	t1con
+	clrf	tmr1l
+	clrf	tmr1h
+	bsf		status,5
+	bsf		pie1,0		;enable timer1 interupt
+	bcf		status,5
+	return
+
+init_tmr2
+	movlw	b'01111110'		;prescale16, postscale 16, tmr on
+	movwf	t2con			
+	movlw	0xff			; = 65536uS to TMR2IF flag
+	bsf		status,5
+	movwf	pr2
+	bcf		status,5
+	return
+
+init_tmr21
+	movlw	b'01111110'		;prescale16, postscale 16, tmr on
+	movwf	t2con			
+	movlw	0x39			; = 14.6ms to TMR2IF flag
+	bsf		status,5
+	movwf	pr2
+	bcf		status,5
+	return
+
+delay1	; about 10uS  (for a/d) 
+	movlw	10		
+	movwf	temp
+sd
+	decfsz	temp,1
+	goto	sd
+	return
+
+delay2	; temp	 ABOUT 1MS
+	movlw	0xff		
+	movwf	temp
+zz
+	decfsz	temp,1
+	goto	zz
+	return
+
+
+
+do_irq
+	bsf		flag1,tim_fl	
+	bcf		pir1,0		; clr int flag
+	retfie	;return
+
+
+;display data. Load dig_dat1...dig_dat4 with data for required leds on.
+
+disp_0
+	movlw	b'11111111'
+	movwf	dig_dat1
+	movlw	b'00001111'
+	movwf	dig_dat2
+	movlw	b'11111111'
+	movwf	dig_dat3
+	movlw	b'00001111'
+	movwf	dig_dat4
+	return
+
+disp_1
+	movlw	b'00000000'
+	movwf	dig_dat1
+	movlw	b'00001111'
+	movwf	dig_dat2
+	movlw	b'11110000'
+	movwf	dig_dat3
+	movlw	b'00000000'
+	movwf	dig_dat4
+	return
+
+disp_2
+	movlw	b'11111111'
+	movwf	dig_dat1
+	movlw	b'11110001'
+	movwf	dig_dat2
+	movlw	b'11111000'
+	movwf	dig_dat3
+	movlw	b'00001111'
+	movwf	dig_dat4
+	return
+
+disp_3
+	movlw	b'11111111'
+	movwf	dig_dat1
+	movlw	b'11110001'
+	movwf	dig_dat2
+	movlw	b'10001111'
+	movwf	dig_dat3
+	movlw	b'00001111'
+	movwf	dig_dat4
+	return
+
+disp_4
+	movlw	b'11110000'
+	movwf	dig_dat1
+	movlw	b'11111111'
+	movwf	dig_dat2
+	movlw	b'00001111'
+	movwf	dig_dat3
+	movlw	b'00000000'
+	movwf	dig_dat4
+	return
+
+disp_5
+	movlw	b'00001111'
+	movwf	dig_dat1
+	movlw	b'11111111'
+	movwf	dig_dat2
+	movlw	b'10001111'
+	movwf	dig_dat3
+	movlw	b'00001111'
+	movwf	dig_dat4
+	return
+
+disp_6
+	movlw	b'00011111'
+	movwf	dig_dat1
+	movlw	b'11111111'
+	movwf	dig_dat2
+	movlw	b'11111111'
+	movwf	dig_dat3
+	movlw	b'00001111'
+	movwf	dig_dat4
+	return
+
+disp_7
+	movlw	b'11111111'
+	movwf	dig_dat1
+	movlw	b'00000000'
+	movwf	dig_dat2
+	movlw	b'00001111'
+	movwf	dig_dat3
+	movlw	b'00000000'
+	movwf	dig_dat4
+	return
+
+disp_8
+	movlw	b'11111111'
+	movwf	dig_dat1
+	movlw	b'11111111'
+	movwf	dig_dat2
+	movlw	b'11111111'
+	movwf	dig_dat3
+	movlw	b'00001111'
+	movwf	dig_dat4
+	return
+
+disp_9
+	movlw	b'11111111'
+	movwf	dig_dat1
+	movlw	b'11111111'
+	movwf	dig_dat2
+	movlw	b'00001111'
+	movwf	dig_dat3
+	movlw	b'00000000'
+	movwf	dig_dat4
+	return
+
+disp_bl	;blank
+	clrf	dig_dat1
+	clrf	dig_dat2
+	clrf	dig_dat3
+	clrf	dig_dat4
+	return
+	end
+
+;#######################################################

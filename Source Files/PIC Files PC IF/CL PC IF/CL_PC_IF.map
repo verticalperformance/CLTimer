@@ -1,0 +1,84 @@
+MPLINK 4.35, Linker
+Linker Map File - Created Mon Jan 04 18:00:52 2016
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000010    program   0x00018a
+  .config_2007_CL_PC_IF.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000010    0x0000d4      
+                            0x002007    0x002007      
+            199 out of 4101 program addresses used, program memory utilization is 4%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    SendX   0x0000a1    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 dectime2   0x0000a8    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                init_uart   0x0000c4    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp1off   0x000089    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp2off   0x00008f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp3off   0x000095    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp4off   0x00009b    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     main   0x00002f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+               pollswitch   0x000033    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s2   0x000036    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s3   0x000039    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s4   0x00003c    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s5   0x00003f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                    start   0x000010    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw1   0x000051    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw1a   0x000056    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw2   0x00005f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw2a   0x000064    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw3   0x00006d    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw3a   0x000072    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw4   0x00007b    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw4a   0x000080    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     test   0x0000aa    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                wait_tmr1   0x0000bd    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     xmit   0x0000cd    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    start   0x000010    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     main   0x00002f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+               pollswitch   0x000033    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s2   0x000036    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s3   0x000039    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s4   0x00003c    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                       s5   0x00003f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw1   0x000051    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw1a   0x000056    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw2   0x00005f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw2a   0x000064    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw3   0x00006d    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw3a   0x000072    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                      sw4   0x00007b    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     sw4a   0x000080    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp1off   0x000089    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp2off   0x00008f    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp3off   0x000095    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 lamp4off   0x00009b    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                    SendX   0x0000a1    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                 dectime2   0x0000a8    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     test   0x0000aa    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                wait_tmr1   0x0000bd    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                init_uart   0x0000c4    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+                     xmit   0x0000cd    program     static C:\Our Files\Glenn\PicJobs\CL PC IF\CL_PC_IF.asm
+
+

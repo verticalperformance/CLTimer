@@ -1,0 +1,735 @@
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ; Source code for CL System switch encoder.
+                      00002 ; 
+                      00003 ;Pulse timing assumes xtal at 3.579Mhz
+                      00004  
+                      00005 ;       Lap switches = xmit A,B,C
+                      00006 ;       Start switch = xmit D
+                      00007 ;       Idle = xmit X
+                      00008 
+                      00009 ;26/7/15 
+                      00010 ; Tested OK
+                      00011 ;                  ^^^^^^^^^^^^^^^^^^^^^^^^
+                      00012 
+                      00013 
+                      00014    list      p=16f73           ; list directive to define processor
+                      00015    #include <p16f73.inc>        ; processor specific variable definitions
+                      00001         LIST
+                      00002 ; P16F73.INC  Standard Header File, Version 1.00    Microchip Technology, Inc.
+                      00320         LIST
+                      00016 
+2007   3FF1           00017    __CONFIG   _CP_OFF & _WDT_OFF & _PWRTE_ON & _XT_OSC
+                      00018 
+                      00019 
+  00000020            00020 scratch equ     0x20
+                      00021 
+                      00022 ; variables
+                      00023 
+  00000020            00024 swflag          equ     scratch+0               
+  00000021            00025 sw1count        equ     scratch+1
+  00000022            00026 sw2count    equ scratch+2
+  00000023            00027 sw3count        equ     scratch+3               
+  00000024            00028 sw4count        equ scratch+4
+  00000025            00029 var1            equ scratch+5
+  00000026            00030 swtime      equ scratch+6
+                      00031 ;swtimeoff   equ        scratch+7
+                      00032 ;flag1       equ        scratch+8
+  00000029            00033 time2       equ scratch+9
+  0000002D            00034 var2        equ scratch+0xd
+  0000002E            00035 inhibit     equ scratch+0xe
+                      00036 
+                      00037 
+                      00038 ; -----------------------                               
+                      00039 
+                      00040 ; constants
+  00000000            00041 indf            equ 0
+  00000004            00042 fsr         equ 4
+  00000003            00043 status          equ 3              ; status register, also at 0x83
+  00000005            00044 porta       equ 5
+  00000006            00045 portb           equ 6
+  00000007            00046 portc       equ 7
+  00000005            00047 trisa           equ 0x5          ; port ddr - in bank 1 (=85)
+  00000006            00048 trisb       equ 0x6
+  00000007            00049 trisc       equ 0x7
+  00000001            00050 tmr0        equ 1
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  00000001            00051 opt         equ 1              ;TMR0 option reg - in bank 1 (=81)
+  0000000E            00052 tmr1l       equ 0x0e
+  0000000F            00053 tmr1h           equ 0x0f
+  00000010            00054 t1con           equ 0x10
+  00000012            00055 t2con           equ 0x12
+  0000000C            00056 t2flag      equ 0x0c
+  00000011            00057 tmr2        equ 0x11
+  00000012            00058 pr2         equ 0x12        ; bank1 (=92)
+  0000001F            00059 adcon0          equ 0x1f
+  0000001E            00060 adres           equ 0x1e
+  00000019            00061 txreg       equ 0x19
+  0000000C            00062 pir1        equ 0x0c
+  0000000A            00063 pclath          equ 0x0a
+  00000018            00064 rcsta       equ 0x18
+  0000001A            00065 rcreg       equ 0x1a
+  0000000B            00066 intcon          equ 0x0b
+  0000000C            00067 pie1        equ 0x0c        ;bank1 8c
+  0000009F            00068 adcon1          equ 0x9f
+                      00069 
+                      00070 ; Bit Definitions
+                      00071 
+  00000005            00072 rp0         equ 5                     ;register page
+  00000002            00073 ferr        equ 2            ;rx framing error
+  00000001            00074 oerr        equ 1            ; rx overun
+  00000004            00075 cren        equ 4              ; uart rx en
+  00000005            00076 rcif        equ 5              ; rvcd data flag
+                      00077 
+                      00078 ;inhit flag bits
+  00000000            00079 inh1        equ 0
+  00000001            00080 inh2        equ 1
+  00000002            00081 inh3        equ 2
+  00000003            00082 inh4        equ 3
+                      00083 
+                      00084 
+                      00085 
+                      00086 ;************************************************************
+                      00087 
+                      00088 ; port assignment
+                      00089 ;
+                      00090 ;               RB0 = Sw1 i/p 
+                      00091 ;               RB1 = Sw2 i/p
+                      00092 ;               RB2 = Sw3 i/p
+                      00093 ;               RB3 = Sw4 i/p
+                      00094 ;               RA0 = Led1 o/p
+                      00095 ;               RA1 = Led2 o/p
+                      00096 ;               RA2 = Led3 o/p
+                      00097 ;               RA3 = Led4 o/p
+                      00098 ;               RC1 = Pwr Led o/p               1 = on
+                      00099 ;               RC6 = Tx Data
+                      00100                         
+                      00101 ;###########################################################################
+                      00102 ; begin
+0000                  00103                 org          0
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0000   2810           00104         goto        start
+0010                  00105         org          10                            
+0010                  00106 start        
+                      00107 
+0010   0185           00108                 clrf    porta                   ;clear port output latches
+0011   0186           00109                 clrf    portb
+0012   0187           00110                 clrf    portc
+                      00111 
+0013   1683           00112                 bsf             status,rp0              ;bank1
+0014   30FF           00113                 movlw   b'11111111'             ; set port B as input
+0015   0086           00114         movwf   trisb
+0016   3007           00115                 movlw    b'00000111'    
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0017   009F           00116                 movwf   adcon1                  ;enable port a outputs??     
+0018   30F0           00117                 movlw   b'11110000'     ; set port A 0-3 as output
+0019   0085           00118                 movwf   trisa
+001A   30BD           00119         movlw   b'10111101'    ;set port C 1,6 as output
+001B   0087           00120         movwf   trisc
+001C   30AE           00121         movlw   0xae
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001D   0092           00122         movwf   PR2            ;Preset TMR2 period for time = 50ms
+001E   1283 1303      00123         banksel 0                               ;set bank0
+                      00124 
+0020   3031           00125                 movlw   b'00110001'             ;timer 1, prescale 8, timer mode 
+0021   0090           00126                 movwf   t1con
+0022   307E           00127         movlw    b'01111110'    ;timer 2, prescale 16, postscale 16
+0023   0092           00128         movwf    t2con
+                      00129 
+0024   01A1           00130         clrf    sw1count
+0025   01A2           00131         clrf    sw2count
+0026   01A3           00132         clrf    sw3count
+0027   01A4           00133         clrf    sw4count
+0028   01A0           00134         clrf    swflag
+0029   01AE           00135         clrf    inhibit
+002A   20C4           00136         call    init_uart
+002B   1487           00137                 bsf             portc,1                 ;power led on
+002C   20AA           00138         call    test            ;cycle lamps on power up
+                      00139 
+002D   3007           00140         movlw   .07
+002E   00A6           00141         movwf   swtime          ;Set time delay between switch presses to 0.7 sec
+                      00142  
+                      00143 
+                      00144 ; now done with initialising
+                      00145         ; *** Main loop ***
+002F                  00146 main
+002F   30D3           00147                 movlw   0xd3
+0030   008F           00148         movwf   tmr1h            ;preset timer count to $d39c (0.1 secs)
+0031   3000           00149         movlw   0x00
+0032   008E           00150         movwf   tmr1l
+                      00151                                 
+0033                  00152 pollswitch              
+                      00153 
+0033   1806           00154         btfsc   portb,0
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0034   2851           00155                 goto    sw1             ;switch 1 is on
+0035   102E           00156         bcf     inhibit,inh1    ;switch is off, allow next switch press to be processed at "sw1"
+                      00157 
+0036   1886           00158 s2      btfsc   portb,1
+0037   285F           00159         goto    sw2
+0038   10AE           00160         bcf     inhibit,inh2            
+                      00161 
+0039   1906           00162 s3      btfsc   portb,2
+003A   286D           00163         goto    sw3
+003B   112E           00164         bcf     inhibit,inh3            
+                      00165 
+003C   1986           00166 s4              btfsc   portb,3
+003D   287B           00167         goto    sw4         
+003E   11AE           00168         bcf     inhibit,inh4
+                      00169 
+003F   188C           00170 s5      btfsc   pir1,1        ;test TMR2 flag
+0040   20A1           00171         call    SendX
+                      00172 
+0041   1C0C           00173         btfss   pir1,0        ;check if timer1 got to FFFF & set flag 
+0042   2833           00174         goto    pollswitch
+                      00175 
+0043   100C           00176         bcf     pir1,0        ; every 0.1 secs check lamp status....
+0044   08A1           00177         tstf    sw1count          ;if any lamps are on, turn them off after 1 sec
+0045   1D03           00178         skpz
+0046   2089           00179         call    lamp1off                ;if went to 0, turn the lamp off
+0047   08A2           00180         tstf    sw2count           ;if any lamps are on, turn them off after 1 sec
+0048   1D03           00181         skpz
+0049   208F           00182         call    lamp2off 
+004A   08A3           00183         tstf    sw3count              
+004B   1D03           00184         skpz
+004C   2095           00185         call    lamp3off 
+004D   08A4           00186         tstf    sw4count              
+004E   1D03           00187         skpz
+004F   209B           00188         call    lamp4off 
+                      00189 
+0050   282F           00190         goto    main
+                      00191 
+                      00192 
+0051                  00193 sw1
+0051   08A1           00194         tstf    sw1count
+0052   1903           00195         skpnz
+0053   2856           00196         goto    sw1a
+0054   142E           00197         bsf     inhibit,inh1           
+0055   2836           00198         goto    s2              ;not 0, wait "swtime" x timer1 from last sw press
+0056                  00199 sw1a
+0056   182E           00200         btfsc   inhibit,inh1          
+0057   2836           00201         goto    s2              ;wait for switch release
+                      00202 
+0058   0826           00203         movfw   swtime
+0059   00A1           00204         movwf   sw1count        ;reset count (is decremented by timer1 in "pollswitch" loop
+005A   3001           00205         movlw   b'00000001'     ;turn lamp on
+005B   0485           00206         iorwf   porta,f
+005C   3041           00207         movlw   a'A'
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+005D   20CD           00208         call    xmit            ; transmit "A" for sw 1
+005E   2836           00209         goto    s2
+005F                  00210 sw2
+005F   08A2           00211         tstf    sw2count
+0060   1903           00212         skpnz
+0061   2864           00213         goto    sw2a
+0062   14AE           00214         bsf     inhibit,inh2            
+0063   2839           00215         goto    s3              ;not 0, wait "swtime" x timer1 from last sw press
+0064                  00216 sw2a
+0064   18AE           00217         btfsc   inhibit,inh2          
+0065   2839           00218         goto    s3              ;wait for switch release                                       
+0066   0826           00219         movfw   swtime
+0067   00A2           00220         movwf   sw2count        ;reset count (is decremented by timer1 in "pollswitch" loop
+0068   3002           00221         movlw   b'00000010'     ;turn lamp on
+0069   0485           00222         iorwf   porta,f
+006A   3042           00223         movlw   a'B'
+006B   20CD           00224         call    xmit            ; transmit "B" for sw 2
+006C   2839           00225         goto    s3
+                      00226 
+006D                  00227 sw3
+006D   08A3           00228                 tstf    sw3count
+006E   1903           00229         skpnz
+006F   2872           00230         goto    sw3a
+0070   152E           00231         bsf     inhibit,inh3            
+0071   283C           00232         goto    s4              ;not 0, wait "swtime" x timer1 from last sw press
+0072                  00233 sw3a    
+0072   192E           00234                 btfsc   inhibit,inh3            
+0073   283C           00235         goto    s4              ;wait for switch release                                       
+                      00236 
+0074   0826           00237         movfw   swtime
+0075   00A3           00238         movwf   sw3count        ;reset count (is decremented by timer1 in "pollswitch" loop
+0076   3004           00239         movlw   b'00000100'     ;turn lamp on
+0077   0485           00240         iorwf   porta,f
+0078   3043           00241         movlw   a'C'
+0079   20CD           00242         call    xmit            ; transmit "C" for sw 3
+007A   283C           00243         goto    s4
+007B                  00244 sw4
+007B   08A4           00245         tstf    sw4count
+007C   1903           00246         skpnz
+007D   2880           00247         goto    sw4a
+007E   15AE           00248         bsf     inhibit,inh4            
+007F   283F           00249         goto    s5              ;not 0, wait "swtime" x timer1 from last sw press
+0080                  00250 sw4a
+0080   19AE           00251         btfsc   inhibit,inh4            
+0081   283F           00252         goto    s5              ;wait for switch release                                                
+                                   
+                      00253 
+0082   0826           00254         movfw   swtime
+0083   00A4           00255         movwf   sw4count        ;reset count (is decremented by timer1 in "pollswitch" loop
+0084   3008           00256         movlw   b'0001000'      ;turn lamp on
+0085   0485           00257         iorwf   porta,f
+0086   3044           00258         movlw   a'D'
+0087   20CD           00259         call    xmit            ; transmit "D" for sw 4
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0088   283F           00260         goto    s5
+                      00261 
+                      00262 
+0089                  00263 lamp1off                         ;lamp1 count was not 0
+0089   03A1           00264                 decf    sw1count,f       ;decrement the switch count (if not 0) every 0.1 seconds
+008A   1D03           00265         skpz
+008B   0008           00266         return                   ;stil not 0
+008C   30FE           00267         movlw   b'11111110'
+008D   0585           00268         andwf   porta,f          ;clear porta bit 0 (lamp1)
+008E   0008           00269         return
+                      00270 
+008F                  00271 lamp2off                         ;lamp2 was not 0
+008F   03A2           00272         decf    sw2count,f       ;decrement the switch count (if not 0) every 0.1 seconds
+0090   1D03           00273         skpz
+0091   0008           00274         return                   ;stil not 0
+0092   30FD           00275         movlw   b'11111101'
+0093   0585           00276         andwf   porta,f          ;clear porta bit 1 (lamp2)
+0094   0008           00277         return
+0095                  00278 lamp3off                         ;lamp3 was not 0
+0095   03A3           00279         decf    sw3count,f       ;decrement the switch count (if not 0) every 0.1 seconds
+0096   1D03           00280         skpz
+0097   0008           00281         return                   ;stil not 0
+0098   30FB           00282         movlw   b'11111011'
+0099   0585           00283         andwf   porta,f          ;clear porta bit 2 (lamp3)
+009A   0008           00284         return
+009B                  00285 lamp4off                         ;lamp4 was not 0
+009B   03A4           00286         decf    sw4count,f       ;decrement the switch count (if not 0) every 0.1 seconds
+009C   1D03           00287         skpz
+009D   0008           00288         return                   ;stil not 0
+009E   30F7           00289         movlw   b'11110111'
+009F   0585           00290         andwf   porta,f          ;clear porta bit 3 (lamp4)
+00A0   0008           00291         return     
+                      00292 
+00A1                  00293 SendX
+00A1   108C           00294                 bcf             pir1,1          ;clr tmr2 flag
+00A2   08A9           00295         tstf    time2
+00A3   1D03           00296         skpz
+00A4   28A8           00297         goto    dectime2        ;time delay is TMR2 (50ms) x time2 value
+00A5   3058           00298         movlw   'X'
+00A6   20CD           00299         call    xmit
+00A7   0008           00300         return     
+00A8                  00301 dectime2
+00A8   03A9           00302         decf    time2,f    
+00A9   0008           00303         return
+                      00304 
+                      00305 ;***************************
+                      00306 
+00AA                  00307 test
+                      00308                 ;cycle lamps on power up, 0.5 secs on 
+00AA   3031           00309                 movlw    b'00110001'    ;timer 1, prescale 8, timer mode 
+00AB   0090           00310         movwf    t1con                      ; 
+00AC   3022           00311         movlw    0x22
+00AD   008F           00312         movwf    tmr1h          ;preset timer count to $2200
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00AE   018E           00313         clrf     tmr1l
+                      00314 
+00AF   3001           00315                 movlw    b'00000001'
+00B0   0085           00316         movwf    porta          ;set lamp1 on
+00B1   20BD           00317         call     wait_tmr1
+00B2   3002           00318                 movlw    b'00000010'
+00B3   0085           00319         movwf    porta          ;set lamp2 on
+00B4   20BD           00320         call     wait_tmr1
+                      00321 
+00B5   3004           00322         movlw    b'00000100'
+00B6   0085           00323         movwf    porta          ;set lamp3 on
+00B7   20BD           00324         call     wait_tmr1
+                      00325 
+00B8   3008           00326         movlw    b'00001000'
+00B9   0085           00327         movwf    porta          ;set lamp4 on
+00BA   20BD           00328         call     wait_tmr1       
+00BB   0185           00329         clrf     porta
+00BC   0008           00330         return
+                      00331 
+00BD                  00332 wait_tmr1
+00BD   1C0C           00333         btfss    pir1,0         ;wait for timer to count to ffff and set flag
+00BE   28BD           00334         goto     wait_tmr1
+00BF   3022           00335         movlw    0x22
+00C0   008F           00336         movwf    tmr1h          ;preset timer count to $2200 = 0.5secs
+00C1   018E           00337         clrf     tmr1l
+00C2   100C           00338         bcf      pir1,0      
+00C3   0008           00339         return
+                      00340 
+00C4                  00341 init_uart
+00C4   1683           00342         bsf      status,5
+00C5   302E           00343         movlw    d'46'          ;set 1200 baud
+00C6   0099           00344         movwf    0x19                        
+00C7   3020           00345         movlw    b'00100000'
+00C8   0098           00346         movwf    0x18           ;enable uart xmit, 8bit, async              
+00C9   1283           00347         bcf      status,5
+00CA   3090           00348         movlw    b'10010000'
+00CB   0098           00349         movwf    0x18           ;enable rx/tx port
+00CC   0008           00350         return
+                      00351 
+                      00352                 ; write w to serial port
+00CD                  00353 xmit         
+00CD   1E0C           00354                 btfss   pir1,4          ;test for TXIF flag, wait if clr 
+00CE   28CD           00355         goto    xmit         
+00CF   0099           00356         movwf   txreg
+00D0   0191           00357         clrf    tmr2            ;reset Timer2, wait for timeout before sending another "X"
+00D1   108C           00358         bcf     pir1,1          ;clr tmr2 flag
+00D2   3014           00359         movlw   .20             ;preset external count to 20 (20 x 50ms = 1 second)
+00D3   00A9           00360         movwf   time2
+00D4   0008           00361         return
+                      00362 
+                      00363        end
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRES                             0000001E
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CKE                               00000006
+CKP                               00000004
+CREN                              00000004
+CSRC                              00000007
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+D_A                               00000005
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+I2C_STOP                          00000004
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PMADR                             0000010D
+PMADRH                            0000010F
+PMCON1                            0000018C
+PMDATA                            0000010C
+PMDATH                            0000010E
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+R                                 00000002
+RBIE                              00000003
+RBIF                              00000000
+RC8_9                             00000006
+RC9                               00000006
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RCD8                              00000000
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RX9                               00000006
+RX9D                              00000000
+R_W                               00000002
+S                                 00000003
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+SendX                             000000A1
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE 11
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISB                             00000086
+TRISC                             00000087
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+WCOL                              00000007
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_CP_ALL                           00003FEF
+_CP_OFF                           00003FFF
+_HS_OSC                           00003FFE
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F73                           00000001
+adcon0                            0000001F
+adcon1                            0000009F
+adres                             0000001E
+cren                              00000004
+dectime2                          000000A8
+ferr                              00000002
+fsr                               00000004
+indf                              00000000
+inh1                              00000000
+inh2                              00000001
+inh3                              00000002
+inh4                              00000003
+inhibit                           0000002E
+init_uart                         000000C4
+intcon                            0000000B
+lamp1off                          00000089
+lamp2off                          0000008F
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+lamp3off                          00000095
+lamp4off                          0000009B
+main                              0000002F
+oerr                              00000001
+opt                               00000001
+pclath                            0000000A
+pie1                              0000000C
+pir1                              0000000C
+pollswitch                        00000033
+porta                             00000005
+portb                             00000006
+portc                             00000007
+pr2                               00000012
+rcif                              00000005
+rcreg                             0000001A
+rcsta                             00000018
+rp0                               00000005
+s2                                00000036
+s3                                00000039
+s4                                0000003C
+s5                                0000003F
+scratch                           00000020
+start                             00000010
+status                            00000003
+sw1                               00000051
+sw1a                              00000056
+sw1count                          00000021
+sw2                               0000005F
+sw2a                              00000064
+sw2count                          00000022
+sw3                               0000006D
+sw3a                              00000072
+sw3count                          00000023
+sw4                               0000007B
+sw4a                              00000080
+sw4count                          00000024
+swflag                            00000020
+swtime                            00000026
+t1con                             00000010
+t2con                             00000012
+t2flag                            0000000C
+test                              000000AA
+time2                             00000029
+tmr0                              00000001
+tmr1h                             0000000F
+tmr1l                             0000000E
+tmr2                              00000011
+trisa                             00000005
+trisb                             00000006
+trisc                             00000007
+txreg                             00000019
+var1                              00000025
+var2                              0000002D
+MPASM  5.35                      CL_PC_IF.ASM   1-4-2016  18:00:50         PAGE 13
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+wait_tmr1                         000000BD
+xmit                              000000CD
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X--------------- XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+00C0 : XXXXXXXXXXXXXXXX XXXXX----------- ---------------- ----------------
+2000 : -------X-------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   198
+Program Memory Words Free:  3898
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     2 reported,     0 suppressed
+
+

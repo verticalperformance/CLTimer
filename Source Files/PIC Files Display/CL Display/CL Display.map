@@ -1,0 +1,140 @@
+MPLINK 4.35, Linker
+Linker Map File - Created Wed Nov 04 19:39:42 2015
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000002
+                   .org_1       code   0x000004    program   0x000002
+                   .cinit    romdata   0x000005    program   0x000004
+                   .org_2       code   0x000010    program   0x000318
+.config_2007_CL_DISPLAY.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x000006      
+                            0x000010    0x00019b      
+                            0x002007    0x002007      
+            401 out of 4101 program addresses used, program memory utilization is 9%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                 all_zero   0x000137    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      az1   0x000138    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      cha   0x000063    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chb   0x00006d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chc   0x000077    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chd   0x000092    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chi   0x000086    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chs   0x00009f    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chx   0x000081    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chz   0x0000a9    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  clr_aux   0x000054    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 clr_disp   0x0000c3    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr0   0x0000f7    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr1   0x0000fa    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr2   0x0000fd    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr3   0x000100    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr4   0x000103    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr5   0x000106    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr6   0x000109    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr7   0x00010c    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr8   0x00010f    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr9   0x000112    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                       d1   0x000152    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                data_fail   0x000050    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 disp_cnr   0x0000ce    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  disp_no   0x0000b6    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   do_irq   0x000156    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   do_rcv   0x000036    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      id1   0x000124    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      id2   0x000129    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  id_done   0x000136    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_tmr0   0x00016e    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_tmr1   0x00016b    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_tmr2   0x000160    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               init_tmr21   0x000159    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_uart   0x000174    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     main   0x00002d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  no_data   0x00004d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   nxt_id   0x000130    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               rcv_error1   0x000043    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               rcv_error2   0x000048    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   rcv_no   0x0000ae    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                read_port   0x00003d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                set_board   0x00012b    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   set_id   0x000115    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                    start   0x000010    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               test_count   0x00017d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 tst_char   0x00005e    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+              tst_display   0x00013d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                       w1   0x00014d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   wait05   0x00014b    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  wait_t2   0x000151    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                    start   0x000010    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     main   0x00002d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   do_rcv   0x000036    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                read_port   0x00003d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               rcv_error1   0x000043    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               rcv_error2   0x000048    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  no_data   0x00004d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                data_fail   0x000050    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  clr_aux   0x000054    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 tst_char   0x00005e    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      cha   0x000063    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chb   0x00006d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chc   0x000077    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chx   0x000081    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chi   0x000086    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chd   0x000092    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chs   0x00009f    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      chz   0x0000a9    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   rcv_no   0x0000ae    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  disp_no   0x0000b6    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 clr_disp   0x0000c3    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 disp_cnr   0x0000ce    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr0   0x0000f7    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr1   0x0000fa    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr2   0x0000fd    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr3   0x000100    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr4   0x000103    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr5   0x000106    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr6   0x000109    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr7   0x00010c    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr8   0x00010f    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                     cnr9   0x000112    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   set_id   0x000115    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      id1   0x000124    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      id2   0x000129    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                set_board   0x00012b    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   nxt_id   0x000130    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  id_done   0x000136    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                 all_zero   0x000137    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                      az1   0x000138    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+              tst_display   0x00013d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   wait05   0x00014b    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                       w1   0x00014d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                  wait_t2   0x000151    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                       d1   0x000152    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                   do_irq   0x000156    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               init_tmr21   0x000159    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_tmr2   0x000160    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_tmr1   0x00016b    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_tmr0   0x00016e    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+                init_uart   0x000174    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+               test_count   0x00017d    program     static C:\Our Files\Glenn\PicJobs\CL Display\CL_Display.asm
+
+
