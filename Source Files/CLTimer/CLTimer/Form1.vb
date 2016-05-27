@@ -9,6 +9,10 @@
 '       Aux O/P (sounder) OK.
 
 '15/3/16 Copied from Dev PC as working version
+'----------------------------------------------
+'Keith
+'16/5/16 Made variables for heat and final laps
+'17/6/16 Refactored Rerun clicks into single event
 
 Imports System.Text
 Imports System
@@ -54,13 +58,13 @@ Public Class CLTimer
     Dim RunLoop As Boolean = False
     Dim Delay As Integer
     Dim DataOut As String
-    Dim Lap200 As Boolean = False       'default is 100 laps
+    Dim RaceIsAFinal As Boolean = False       'default is 100 laps
     Dim NoClock As Boolean = False
     Dim SwTest As Boolean = False
     Dim Update1 As Boolean = False
     Dim Update2 As Boolean = False
     Dim Update3 As Boolean = False
-    Dim PortNo As String = "COM5"
+    Dim PortNo As String = "COM3"  ' COM5 in perth
     Dim tim8 As Boolean
     Dim x_count As Integer
     Dim D_Level As Integer = 6
@@ -77,6 +81,10 @@ Public Class CLTimer
     Public results As String
     Public SecSize As Integer
 
+    Public HeatLaps As Integer = 100  'Need to get this stuff into a config file
+    Public FinalLaps As Integer = 200
+
+
     Dim SerialPort1 As IO.Ports.SerialPort = New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
 
 
@@ -86,6 +94,10 @@ Public Class CLTimer
         StateLn2.BackColor = Color.LightYellow
         StateLn3.BackColor = Color.LightYellow
         RcvData.BackColor = Color.Red
+
+        RunHeatToolStripMenuItem.Text = HeatLaps.ToString & " Lap Heat"
+        RunFinalToolStripMenuItem.Text = FinalLaps.ToString & " Lap Final"
+        RaceFormat.Text = HeatLaps.ToString & " Lap Heat"
 
         bnStart.Enabled = False
         bnSave.Enabled = False
@@ -106,7 +118,11 @@ Public Class CLTimer
         Clear_Display()
         Timer3.Start()
         RunState = "Idle"
-        StartState = "Auto"
+        'StartState = "Auto"
+        StartState = "Manual"
+
+        DisplayControlsForStartType()
+
 
     End Sub
     Sub MainLoop()
@@ -255,7 +271,7 @@ Loop1:
         Timer4.Start()          'Trigger display update every 0.5 secs
         UpDisplay = False
 
-    
+
 
     End Sub
 
@@ -263,54 +279,54 @@ Loop1:
         Dim X, y As Integer
         Dim char1 As String
 
-            ReadIn1()               'read serial port 1 (Timers)
-            X = DataIn.Length
-            y = 0
-            While y < X             ' handle all char's received seperately
-                char1 = DataIn.Substring(y, 1)
-                If InStr("ABCDX", char1) Then
-                    CurrTime = My.Computer.Clock.TickCount.ToString
-                    CurrTime = CurrTime / 1000
-                    Select Case char1
-                        Case "A"
+        ReadIn1()               'read serial port 1 (Timers)
+        X = DataIn.Length
+        y = 0
+        While y < X             ' handle all char's received seperately
+            char1 = DataIn.Substring(y, 1)
+            If InStr("ABCDX", char1) Then
+                CurrTime = My.Computer.Clock.TickCount.ToString
+                CurrTime = CurrTime / 1000
+                Select Case char1
+                    Case "A"
                         DoLane1()
                         Timer3.Stop()                 'any valid char resets timeout
                         Timer3.Start()
-                        Case "B"
+                    Case "B"
                         DoLane2()
                         Timer3.Stop()
                         Timer3.Start()
-                        Case "C"
+                    Case "C"
                         DoLane3()
                         Timer3.Stop()
                         Timer3.Start()
-                        Case "D"
+                    Case "D"
                         'starter, ignore
-                    End Select
+                End Select
 
-                Else
-                    tbError.Text = ("Data Error")
-                    tbError.BackColor = Color.Red
-                End If
-                y = y + 1
-            End While
+            Else
+                tbError.Text = ("Data Error")
+                tbError.BackColor = Color.Red
+            End If
+            y = y + 1
+        End While
 
-            If UpDisplay Then           'Timer 4 not still running from last xmit to clock (delay between consecutive messages)
-                If Update1 Then ClockData = ClockData + "A" + DispLap1 + L1FinalMin + L1FinalSec
-                If Update2 Then ClockData = ClockData + "B" + DispLap2 + L2FinalMin + L2FinalSec
-                If Update3 Then ClockData = ClockData + "C" + DispLap3 + L3FinalMin + L3FinalSec
-                If ClockData = "" Then
-                Else
-                    With SerialPort1
-                        .Write(ClockData)   'send data to clock
-                    End With
-                End If
-                ClockData = ""
-                UpDisplay = False
-                Timer4.Start()            'set UpDisplay true after timeout
-                Update1 = False
-                Update2 = False
-                Update3 = False
+        If UpDisplay Then           'Timer 4 not still running from last xmit to clock (delay between consecutive messages)
+            If Update1 Then ClockData = ClockData + "A" + DispLap1 + L1FinalMin + L1FinalSec
+            If Update2 Then ClockData = ClockData + "B" + DispLap2 + L2FinalMin + L2FinalSec
+            If Update3 Then ClockData = ClockData + "C" + DispLap3 + L3FinalMin + L3FinalSec
+            If ClockData = "" Then
+            Else
+                With SerialPort1
+                    .Write(ClockData)   'send data to clock
+                End With
+            End If
+            ClockData = ""
+            UpDisplay = False
+            Timer4.Start()            'set UpDisplay true after timeout
+            Update1 = False
+            Update2 = False
+            Update3 = False
         End If
 
 
@@ -359,14 +375,14 @@ Loop1:
 
             Update1 = True                  'Flag to update the display
 
-            If Lap200 Then
-                If Ln1CurrLap = 200 Then     'if final stop at 200 laps
+            If RaceIsAFinal Then
+                If Ln1CurrLap = FinalLaps Then     'if final stop at 200 laps
                     Ln1State = "Finished"
                     StateLn1.Text = "Finished"
                     StateLn1.BackColor = Color.LightSkyBlue
                     AllDone()               'check if all have finished 
                 End If
-            ElseIf Ln1CurrLap = 100 Then    'if not final and done 100 laps
+            ElseIf Ln1CurrLap = HeatLaps Then    'if not final and done 100 laps
                 Ln1State = "Finished"
                 StateLn1.Text = "Finished"
                 StateLn1.BackColor = Color.LightSkyBlue
@@ -416,14 +432,14 @@ Loop1:
 
             Update2 = True                  'Flag to update the display
 
-            If Lap200 Then
-                If Ln2CurrLap = 200 Then       'if final stop at 200 laps
+            If RaceIsAFinal Then
+                If Ln2CurrLap = FinalLaps Then       'if final stop at 200 laps
                     Ln2State = "Finished"
                     StateLn2.Text = "Finished"
                     StateLn2.BackColor = Color.LightSkyBlue
                     AllDone() 'check if all have finished 
                 End If
-            ElseIf Ln2CurrLap = 100 Then    'if not final and done 100 laps
+            ElseIf Ln2CurrLap = HeatLaps Then    'if not final and done 100 laps
                 Ln2State = "Finished"
                 StateLn2.Text = "Finished"
                 StateLn2.BackColor = Color.LightSkyBlue
@@ -474,14 +490,14 @@ Loop1:
 
             Update3 = True                  'Flag to update the display
 
-            If Lap200 Then
-                If Ln3CurrLap = 200 Then       'if final stop at 200 laps
+            If RaceIsAFinal Then
+                If Ln3CurrLap = FinalLaps Then       'if final stop at 200 laps
                     Ln3State = "Finished"
                     StateLn3.Text = "Finished"
                     StateLn3.BackColor = Color.LightSkyBlue
                     AllDone() 'check if all have finished 
                 End If
-            ElseIf Ln3CurrLap = 100 Then    'if not final and done 100 laps
+            ElseIf Ln3CurrLap = HeatLaps Then    'if not final and done 100 laps
                 Ln3State = "Finished"
                 StateLn3.Text = "Finished"
                 StateLn3.BackColor = Color.LightSkyBlue
@@ -521,6 +537,9 @@ Loop1:
             Update1 = False
             Update2 = False
             Update3 = False
+
+            bnSave.Focus()
+
         End If
 
     End Sub
@@ -541,6 +560,8 @@ Loop1:
                 bnStart.Enabled = True
                 bnSetup.Enabled = False
                 bnSave.Enabled = False
+                bnStart.Focus()
+
                 RunState = "WaitStart"
 
                 MainLoop()
@@ -582,7 +603,7 @@ Loop1:
         If DataOk Then           'During race, Watch should get incremented every second
             RcvData.BackColor = Color.LightGreen
         End If
-      
+
         ClockData = "X"
         With SerialPort1
             If .IsOpen Then .Write(ClockData)
@@ -591,6 +612,12 @@ Loop1:
     End Sub
     Private Sub bnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnStart.Click
         Dim RaceGo As Boolean = False
+
+        If SwTest Then
+            ' Cancel switch testing first
+            EndSwitchTest()
+        End If
+
 
         If DataOk Then
             Select Case RunState
@@ -682,6 +709,7 @@ Loop1:
             End If
         End With
         Me.Close()
+        Application.Exit()
     End Sub
     Sub Start()
 
@@ -731,7 +759,7 @@ Loop1:
         Dim results As String = ""
 
         If Done Then
-            
+
             If Ln1State = "Finished" Then
                 Str1 = StateLn1.Text + Chr(9) + Lane1Laps.Text + Chr(9) + Ln1Time.Text + Chr(9) + vbCr + vbLf
             End If
@@ -751,6 +779,7 @@ Loop1:
             Clear_Display()
             RunState = "Idle"
             bnSetup.Enabled = True
+            bnSetup.Focus()
             bnExit.Enabled = True
 
         Else
@@ -846,8 +875,6 @@ Loop1:
     End Sub
 
 
-
-
     Sub ClearFm()
 
         StateLn1.Clear()
@@ -874,9 +901,6 @@ Loop1:
     End Sub
 
 
-
-
-
     Private Sub Timer4_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer4.Tick
         ' Used to delay xmit of consecutive updates to display
         UpDisplay = True
@@ -884,26 +908,47 @@ Loop1:
 
     End Sub
 
-    Private Sub Timer5_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer5.Tick
-        tbRedSw.BackColor = Color.White
-        tbRedSw.Text = ""
-        Timer5.Stop()
+    'Private Sub Timer5_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer5.Tick
+    '    tbRedSw.BackColor = Color.White
+    '    tbRedSw.Text = ""
+    '    Timer5.Stop()
+    'End Sub
+    'Private Sub Timer6_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer6.Tick
+    '    tbGrnSw.BackColor = Color.White
+    '    tbGrnSw.Text = ""
+    '    Timer6.Stop()
+    'End Sub
+    'Private Sub Timer7_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer7.Tick
+    '    tbAmbSw.BackColor = Color.White
+    '    tbAmbSw.Text = ""
+    '    Timer7.Stop()
+    'End Sub
+    'Private Sub Timer8_Tick(sender As System.Object, e As System.EventArgs) Handles Timer8.Tick
+    '    tbstarter.BackColor = Color.White
+    '    tbstarter.Text = ""
+    '    Timer8.Stop()
+    'End Sub
+
+    Private Sub SwitchTestTimerTick(sender As System.Object, e As System.EventArgs) Handles Timer5.Tick, Timer6.Tick, Timer7.Tick, Timer8.Tick
+        If sender Is Timer5 Then
+            tbRedSw.BackColor = Color.White
+            tbRedSw.Text = ""
+        ElseIf sender Is Timer6 Then
+            tbGrnSw.BackColor = Color.White
+            tbGrnSw.Text = ""
+        ElseIf sender Is Timer7 Then
+            tbAmbSw.BackColor = Color.White
+            tbAmbSw.Text = ""
+        ElseIf sender Is Timer8 Then
+            tbstarter.BackColor = Color.White
+            tbstarter.Text = ""
+        End If
+        sender.Stop() ' Stop the timer
+
     End Sub
-    Private Sub Timer6_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer6.Tick
-        tbGrnSw.BackColor = Color.White
-        tbGrnSw.Text = ""
-        Timer6.Stop()
-    End Sub
-    Private Sub Timer7_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Timer7.Tick
-        tbAmbSw.BackColor = Color.White
-        tbAmbSw.Text = ""
-        Timer7.Stop()
-    End Sub
-    Private Sub Timer8_Tick(sender As System.Object, e As System.EventArgs) Handles Timer8.Tick
-        tbstarter.BackColor = Color.White
-        tbstarter.Text = ""
-        Timer8.Stop()
-    End Sub
+
+
+
 
     Private Sub ClkTest_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ClkTest.Click
         With SerialPort1
@@ -1058,12 +1103,15 @@ Loop1:
                                 Select Case char1
                                     Case "A"
                                         tbRedSw.BackColor = Color.Firebrick
+                                        tbRedSw.Text = "Red"
                                         Timer5.Start()
                                     Case "B"
                                         tbGrnSw.BackColor = Color.OliveDrab
+                                        tbGrnSw.Text = "Green"
                                         Timer6.Start()
                                     Case "C"
                                         tbAmbSw.BackColor = Color.Goldenrod
+                                        tbAmbSw.Text = "Yellow"
                                         Timer7.Start()
                                     Case "D"
                                         tbstarter.BackColor = Color.SkyBlue
@@ -1075,20 +1123,38 @@ Loop1:
                         End While
                     Loop
 
-                Else : SwTest = False
-                    tbRedSw.Clear()
-                    tbRedSw.Visible = False
-                    tbGrnSw.Visible = False
-                    tbAmbSw.Visible = False
-                    tbstarter.Visible = False
-                    Sw_test.Text = "Test Switches"
-                    Sw_test.BackColor = Color.LightGray
-                    Timer3.Start()
+                Else
+                    EndSwitchTest()
+                    '    SwTest = False
+                    '    tbRedSw.Clear()
+                    '    tbRedSw.Visible = False
+                    '    tbGrnSw.Visible = False
+                    '    tbAmbSw.Visible = False
+                    '    tbstarter.Visible = False
+                    '    Sw_test.Text = "Test Switches"
+                    '    Sw_test.BackColor = Color.LightGray
+                    '    Timer3.Start()
                 End If
             End If
         End With
 
     End Sub
+
+    Private Sub EndSwitchTest()
+
+        SwTest = False
+        tbRedSw.Clear()
+        tbRedSw.Visible = False
+        tbGrnSw.Visible = False
+        tbAmbSw.Visible = False
+        tbstarter.Visible = False
+        Sw_test.Text = "Test Switches"
+        Sw_test.BackColor = Color.LightGray
+        Timer3.Start()
+
+
+    End Sub
+
 
     Private Sub Button1_Click(sender As System.Object, e As System.EventArgs) Handles Button1.Click
         With SerialPort1
@@ -1275,45 +1341,54 @@ endsub:
     Private Sub HELPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
     End Sub
-    Private Sub AllPylonsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
 
-    End Sub
 
-    Private Sub No1ToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
-    End Sub
 
-    Private Sub DISABLEToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
-    End Sub
-
-    Private Sub RUN10LAPSToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RUN100LAPSToolStripMenuItem.Click
-        Lap200 = False
-        RaceFormat.Text = "100 Laps"
+    Private Sub RunHeatToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RunHeatToolStripMenuItem.Click
+        RaceIsAFinal = False
+        RaceFormat.Text = HeatLaps.ToString & " Lap Heat"
         RaceFormat.BackColor = Color.LightGray
     End Sub
 
-    Private Sub RUN1012LAPSToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RUN200LAPSToolStripMenuItem.Click
-        Lap200 = True
-        RaceFormat.Text = "200 Lap Final"
+    Private Sub RunFinalToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RunFinalToolStripMenuItem.Click
+        RaceIsAFinal = True
+        RaceFormat.Text = FinalLaps.ToString & " Lap Final"
         RaceFormat.BackColor = Color.Salmon
 
     End Sub
 
     Private Sub CLOCKSTARTToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CLOCKSTARTToolStripMenuItem.Click
         'Start using computer and display    
-        bnStart.Text = ("Start Countdown")
-        lbReady.Visible = False
+        'bnStart.Text = ("Start Countdown")
+        'lbReady.Visible = False
         StartState = "Auto"
+        DisplayControlsForStartType()
     End Sub
 
     Private Sub ManualStartToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ManualStartToolStripMenuItem1.Click
         'start using flag fall
-        bnStart.Text = ("Setup Displays")
-        bnSetup.Text = ("Setup Screen")
+        'bnStart.Text = ("Setup Displays")
+        'bnSetup.Text = ("Setup Screen")
         StartState = "Manual"
+        DisplayControlsForStartType()
     End Sub
+
+
+    Private Sub DisplayControlsForStartType()
+        ' Populate the buttons and labels for a particular start type
+        Select Case StartState
+            Case "Auto"
+                bnStart.Text = ("Start Countdown")
+                lbReady.Visible = False
+            Case "Manual"
+                bnStart.Text = ("Setup Displays")
+                bnSetup.Text = ("Setup Screen")
+        End Select
+    End Sub
+
 
     Private Sub HELPToolStripMenuItem3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HELPToolStripMenuItem3.Click
         'clock start or manual start? 
@@ -1323,31 +1398,46 @@ endsub:
     Private Sub HELPToolStripMenuItem2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
     End Sub
-   
 
-    Private Sub Rerun1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Rerun1.Click
-        Ln1State = "Finished"
-        StateLn1.BackColor = Color.LightSkyBlue
-        StateLn1.Text = "RR"
+
+    Private Sub Rerun_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Rerun1.Click, Rerun2.Click, Rerun3.Click
+
+        Select Case sender.Name
+
+            Case Rerun1.Name
+                Ln1State = "Finished"
+                StateLn1.BackColor = Color.LightSkyBlue
+                StateLn1.Text = "RR"
+            Case Rerun2.Name
+                Ln2State = "Finished"
+                StateLn2.BackColor = Color.LightSkyBlue
+                StateLn2.Text = "RR"
+            Case Rerun3.Name
+                Ln3State = "Finished"
+                StateLn3.BackColor = Color.LightSkyBlue
+                StateLn3.Text = "RR"
+        End Select
+
         AllDone()   'check if all have finished
 
     End Sub
 
-    Private Sub Rerun2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Rerun2.Click
-        Ln2State = "Finished"
-        StateLn2.BackColor = Color.LightSkyBlue
-        StateLn2.Text = "RR"
-        AllDone()   'check if all have finished
+    'Private Sub Rerun2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Rerun2.Click
+    '    Ln2State = "Finished"
+    '    StateLn2.BackColor = Color.LightSkyBlue
+    '    StateLn2.Text = "RR"
+    '    AllDone()   'check if all have finished
 
-    End Sub
+    'End Sub
 
-    Private Sub Rerun3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Rerun3.Click
-        Ln3State = "Finished"
-        StateLn3.BackColor = Color.LightSkyBlue
-        StateLn3.Text = "RR"
-        AllDone()   'check if all have finished
+    'Private Sub Rerun3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Rerun3.Click
+    '    Ln3State = "Finished"
+    '    StateLn3.BackColor = Color.LightSkyBlue
+    '    StateLn3.Text = "RR"
+    '    AllDone()   'check if all have finished
 
-    End Sub
+    'End Sub
+
 
 End Class
 
