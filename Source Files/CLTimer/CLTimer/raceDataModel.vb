@@ -36,7 +36,26 @@ Public Class Race
             TypeValue = value
         End Set
     End Property
+    Private warmUpTimeValue As Integer
+    Public Property WarmUpTime() As Integer
+        Get
+            Return warmUpTimeValue
+        End Get
+        Set(ByVal value As Integer)
+            warmUpTimeValue = value
+        End Set
+    End Property
+    Private coolDownTimeValue As Integer
+    Public Property CoolDownTime() As Integer
+        Get
+            Return coolDownTimeValue
+        End Get
+        Set(ByVal value As Integer)
+            coolDownTimeValue = value
+        End Set
+    End Property
 End Class
+
 Public Class Races
     Inherits System.Collections.CollectionBase
     ' Restricts to Race types, items that can be added to the collection.
@@ -93,12 +112,13 @@ Public Class Races
                         myRace.HeatDistance = fields(1)
                         myRace.FinalDistance = fields(2)
                         myRace.Type = fields(3)
+                        myRace.WarmUpTime = fields(4)
+                        myRace.CoolDownTime = fields(5)
 
                         If fields(3) = "Minutes" Then   'Fudge Ratrace for the moment
                             myRace.HeatDistance = 999
                             myRace.FinalDistance = 999
                         End If
-
 
                         Me.Add(myRace)
                     End If
@@ -112,6 +132,8 @@ Public Class Races
             myRace.HeatDistance = 100
             myRace.FinalDistance = 200
             myRace.Type = "Laps"
+            myRace.WarmUpTime = 90
+            myRace.CoolDownTime = 30
             Me.Add(myRace)
         End If
 

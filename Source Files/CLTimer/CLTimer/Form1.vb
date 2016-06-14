@@ -44,8 +44,9 @@ Public Class CLTimer
     Dim Ln1CurrTime As Integer = 0
     Dim Ln2CurrTime As Integer = 0
     Dim Ln3CurrTime As Integer = 0
-    Dim Ln4CurrTime As Integer = 0
-    Dim Ln1CurrLap, Ln2CurrLap, Ln3CurrLap, Ln4CurrLap As Integer
+    'Dim Ln4CurrTime As Integer = 0
+    'Dim Ln1CurrLap, Ln2CurrLap, Ln3CurrLap, Ln4CurrLap As Integer
+    Dim Ln1CurrLap, Ln2CurrLap, Ln3CurrLap As Integer
     Dim DispLap1 As String = "" 'Red curr laps to display
     Dim DispLap2 As String = "" 'Grn curr laps to display
     Dim DispLap3 As String = "" 'Amb curr laps to display
@@ -70,7 +71,12 @@ Public Class CLTimer
     Dim tim8 As Boolean
     Dim x_count As Integer
     Dim D_Level As Integer = 6
-    Dim StartCount As Integer
+
+    Dim StartCount As Integer = 120 ' This is later re-calculated from config data
+    Dim CountDownTimerDisplay As String = "A"
+
+
+
     Dim ClockData As String
 
     Public sec1 As Double
@@ -83,16 +89,13 @@ Public Class CLTimer
     Public results As String
     Public SecSize As Integer
 
-    Public HeatLaps As Integer = 100  ' Defaults overridden by config file
+    Public HeatLaps As Integer = 100  ' Defaults are overridden by config file
     Public FinalLaps As Integer = 200
 
-    'Public RaceClassesFileName As String = "D:\keith\Documents\Visual Studio 2010\Projects\CLTimer\Source Files\CLTimer\CLTimer\RaceClasses.csv"  ' need to get this from install dir
     Public RaceClassesFileName As String = "RaceClasses.csv"
     Public myRaces As New Races 'Race Data model
 
     Dim SerialPort1 As IO.Ports.SerialPort = New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
-
-
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -146,7 +149,7 @@ Public Class CLTimer
             myRaceName = myRace.Name
             ClassName.Items.Add(myRaceName)
         Next
-        ClassName.SelectedIndex = 0 'Show item 1
+        ClassName.SelectedIndex = 0 'Show item 1, and hence populate race data model
     End Sub
 
 
@@ -182,7 +185,7 @@ Loop1:
                 'do nothing, waiting for start button
             Case "AutoStart"
                 If IncTime Then
-                    Countdown()       'tmrCountDown ticked, decrement start time
+                    Countdown(CountDownTimerDisplay)       'tmrCountDown ticked, decrement start time
                     IncTime = False
                 End If
             Case "WaitStartPress"   'Waiting for manual starter switch press
@@ -226,40 +229,98 @@ Loop1:
         GoTo Loop1
 
     End Sub
-    Sub Countdown()           'Called by tmrCountDown every second
+    'Sub Countdown()           'Called by tmrCountDown every second
 
-        Dim ch1 As String
-        Dim tempsecs As Integer
+    '    Dim ch1 As String
+    '    Dim tempsecs As Integer
+
+    '    StartCount = StartCount - 1
+    '    tbStart.Text = StartCount
+
+    '    If StartCount > 0 Then
+    '        tempsecs = StartCount
+
+    '        If tempsecs > 59 Then
+    '            If tempsecs < 70 Then
+    '                DataOut = "A////10"
+    '            Else
+    '                DataOut = "A////1"     'minutes = 1    (/ = blank)
+    '            End If
+    '            tempsecs = tempsecs - 60
+    '        ElseIf StartCount < 10 Then
+    '            DataOut = "A//////"     'minutes = 0, sec 10's = 0    (/ = blank)
+    '        Else
+    '            DataOut = "A/////"     'minutes = 0, seconds = 59 to 10
+    '        End If
+
+    '        ch1 = tempsecs
+    '        DataOut = DataOut + ch1 + "/"   'display from _ _ _ _ 2:00._ to _ _ _ _ _:_1._    _ = blank
+    '        With SerialPort1
+    '            .Write(DataOut)
+    '        End With
+    '        DataOut = ""
+    '    Else
+    '        StartRace()
+    '    End If  'End of decrement 1 second count
+    'End Sub
+
+    Sub Countdown(DisplayToUse As String) 'Called by tmrCountDown every second
 
         StartCount = StartCount - 1
         tbStart.Text = StartCount
 
         If StartCount > 0 Then
-            tempsecs = StartCount
-
-            If tempsecs > 59 Then
-                If tempsecs < 70 Then
-                    DataOut = "A////10"
-                Else
-                    DataOut = "A////1"     'minutes = 1    (/ = blank)
-                End If
-                tempsecs = tempsecs - 60
-            ElseIf StartCount < 10 Then
-                DataOut = "A//////"     'minutes = 0, sec 10's = 0    (/ = blank)
-            Else
-                DataOut = "A/////"     'minutes = 0, seconds = 59 to 10
-            End If
-
-            ch1 = tempsecs
-            DataOut = DataOut + ch1 + "/"   'display from _ _ _ _ 2:00._ to _ _ _ _ _:_1._    _ = blank
+            DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(StartCount)
             With SerialPort1
                 .Write(DataOut)
             End With
             DataOut = ""
+
         Else
             StartRace()
-        End If  'End of decrement 1 second count
+        End If
+
     End Sub
+
+
+    Function FormatSecondsToMinutesInDisplayFormat(Seconds As Integer) As String
+
+        Dim tsSeconds = TimeSpan.FromSeconds(Seconds)
+        Dim tmpMinutes As String = tsSeconds.ToString("%m")
+        Dim tmpSeconds As String = tsSeconds.ToString("ss")
+
+        If tmpMinutes.Length = 1 Then tmpMinutes = tmpMinutes.Insert(0, "/") 'Remove the leading zero on minutes
+ 
+        FormatSecondsToMinutesInDisplayFormat = "///" & tmpMinutes & tmpSeconds & "/"
+
+    End Function
+
+
+    'Sub Start()
+
+    '    tbStart.BackColor = Color.LightGreen
+    '    ClkLabel.Visible = True
+    '    tbStart.Visible = True
+    '    bnStart.Text = "Stop Clock"
+    '    StartCount = 65 '** temp, set to 120
+
+    '    ' Set up display 1 to 2:00
+    '    DataOut = "A////200/"     'send to display 1, _ _ _ _ 2:00.
+    '    With SerialPort1
+    '        .Write(DataOut)
+    '    End With
+
+    '    tmrCommsOK.Stop()
+    '    tmrCountDown.Start()      '1 second timer, calls Countdown
+
+    'End Sub
+
+    Private Sub tmrCountDown_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCountDown.Tick
+        '1 Sec timer used during 90sec start
+        IncTime = True
+    End Sub
+
+
     Sub StartRace()
 
         tmrCountDown.Stop()
@@ -324,8 +385,6 @@ Loop1:
         tmrConsXmitDelay.Start()          'Trigger display update every 0.5 secs
         UpDisplay = False
 
-
-
     End Sub
 
     Sub Running()
@@ -386,10 +445,13 @@ Loop1:
 
     End Sub
 
+
     Sub DoLane1()
 
         If StateLn1.Text = "Racing" Then
             Ln1CurrLap = Ln1CurrLap + 1
+
+
             sec1 = CurrTime - Lane1Time     'Lane1time saved at start
 
             'convert seconds to Minutes / Seconds 
@@ -399,6 +461,8 @@ Loop1:
             resultm = Format(FinMinutes, "0")      'minutes as string
             results = Format(sec2, "00.00")     'seconds as string
             result = resultm & ":" & results
+
+
             Ln1Time.Text = result               'display on screen
 
             temp4 = Ln1CurrLap
@@ -620,6 +684,19 @@ Loop1:
 
                 RunState = "WaitStart"
 
+                If StartState = "Auto" Then
+                    ClkLabel.Visible = True
+                    tbStart.Visible = True
+                    tbStart.Text = StartCount
+                    lbReady.Visible = False
+                Else
+                    ClkLabel.Visible = False
+                    tbStart.Visible = False
+
+                End If
+
+
+
                 MainLoop()
 
             Else : MessageBox.Show("Not Receiving Data from Timers")
@@ -627,10 +704,7 @@ Loop1:
         End If
 
     End Sub
-    Private Sub tmrCountDown_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCountDown.Tick
-        '1 Sec timer used during 60sec start
-        IncTime = True
-    End Sub
+
 
     Private Sub tmrCommsOK_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCommsOK.Tick
         '3 secs time, used for monitoring data receive from timers. Gets reset while racing if other data received.
@@ -695,7 +769,9 @@ Loop1:
             EndSwitchTest()
         End If
 
-        ' Disable all 
+        ' Reset the warmup/cooldown times
+        StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
+
 
         If DataOk Then
             Select Case RunState
@@ -704,7 +780,7 @@ Loop1:
                     InRaceControlState(True)
 
                     If StartState = "Auto" Then
-                        SetDisplay2()               'setup display 1 for 2:00
+                        SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
                         tmrCountDown.Start()
                         tmrCommsOK.Stop()
                         RunState = "AutoStart"
@@ -712,12 +788,11 @@ Loop1:
                         ClkLabel.Visible = True
                         tbStart.Visible = True
                         bnStart.BackColor = Color.LightGreen
-                        'bnExit.Enabled = False
                         Ln1CurrLap = 0
                         Ln2CurrLap = 0
                         Ln3CurrLap = 0
                         Done = False
-                        StartCount = 120        '2 minute start time
+                        'StartCount = 120        '2 minute start time
 
                     ElseIf StartState = "Manual" Then
                         SetDisplay0()               'Set displays to 00 for manual start
@@ -729,7 +804,6 @@ Loop1:
                         Done = False
                         lbReady.Visible = True
                         lbReady.BackColor = Color.LightGreen
-                        'bnExit.Enabled = False
                     End If
 
                 Case "AutoStart"        'Cancel auto start count down
@@ -742,11 +816,7 @@ Loop1:
 
                     bnStart.Text = "Start Countdown"
                     bnStart.BackColor = Color.Silver
-                    tbStart.BackColor = Color.Silver
-                    ClkLabel.Visible = False
-                    tbStart.Text = ""
-                    tbStart.Visible = False
-                    'bnExit.Enabled = True
+                    tbStart.Text = StartCount
                     Clear_Display()
 
                 Case "WaitStartPress"       'quit waiting for starter
@@ -756,7 +826,6 @@ Loop1:
                     Clear_Display()
                     bnStart.Text = "Setup Display"
                     lbReady.Visible = False
-                    'bnExit.Enabled = True
                     RunState = "WaitStart"
             End Select
         Else
@@ -764,14 +833,17 @@ Loop1:
         End If
     End Sub
 
-    Sub SetDisplay2()
-        'Setup display 1 to 2:00 ready for auto count down
-        DataOut = "A////200/"     'send to display 1, _ _ _ _ 2:00.
+    Sub SetDisplayAsTimer(InitialTime As Integer, DisplayToUse As String)
+        'Setup display A,B or C to InitialTimeValue
+        DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(InitialTime)
         With SerialPort1
             .Write(DataOut)
         End With
 
     End Sub
+
+
+
     Sub SetDisplay0()           'Manual start Laps = 0, Time = 0:00.0
         DataOut = "A//0/0000"
         With SerialPort1
@@ -788,24 +860,6 @@ Loop1:
     End Sub
 
 
-    Sub Start()
-
-        tbStart.BackColor = Color.LightGreen
-        ClkLabel.Visible = True
-        tbStart.Visible = True
-        bnStart.Text = "Stop Clock"
-        StartCount = 65 '** temp, set to 120
-
-        ' Set up display 1 to 2:00
-        DataOut = "A////200/"     'send to display 1, _ _ _ _ 2:00.
-        With SerialPort1
-            .Write(DataOut)
-        End With
-
-        tmrCommsOK.Stop()
-        tmrCountDown.Start()      '1 second timer, calls Countdown
-
-    End Sub
 
 
     Sub bnClearDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnClearDisplay.Click
@@ -1259,7 +1313,6 @@ endsub:
         DisplayControlsForStartType()
     End Sub
 
-
     Private Sub DisplayControlsForStartType()
         ' Populate the buttons and labels for a particular start type
         Select Case StartState
@@ -1268,11 +1321,18 @@ endsub:
                 ManualStartToolStripMenuItem1.Checked = False
                 bnStart.Text = ("Start Countdown")
                 lbReady.Visible = False
+                ClkLabel.Visible = True
+                tbStart.Visible = True
+                tbStart.Text = StartCount
+
             Case "Manual"
                 ManualStartToolStripMenuItem1.Checked = True
                 CLOCKSTARTToolStripMenuItem.Checked = False
                 bnStart.Text = ("Setup Displays")
                 bnSetup.Text = ("Setup Screen")
+                ClkLabel.Visible = False
+                tbStart.Visible = False
+
         End Select
     End Sub
 
@@ -1329,6 +1389,8 @@ endsub:
     Private Sub ClassName_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles ClassName.SelectedIndexChanged
         HeatLaps = myRaces.Item(sender.SelectedIndex).HeatDistance
         FinalLaps = myRaces.Item(sender.SelectedIndex).FinalDistance
+        StartCount = myRaces.Item(sender.SelectedIndex).WarmUpTime + myRaces.Item(sender.SelectedIndex).CoolDownTime
+        tbStart.Text = StartCount
         If radHeat.Checked Then
             RaceFormat.Text = HeatLaps.ToString
         Else
