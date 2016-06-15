@@ -231,7 +231,7 @@ Partial Class CLTimer
         Me.ClkLabel.AutoSize = True
         Me.ClkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.ClkLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.ClkLabel.Location = New System.Drawing.Point(158, 118)
+        Me.ClkLabel.Location = New System.Drawing.Point(146, 118)
         Me.ClkLabel.Name = "ClkLabel"
         Me.ClkLabel.Size = New System.Drawing.Size(70, 13)
         Me.ClkLabel.TabIndex = 121
@@ -440,7 +440,7 @@ Partial Class CLTimer
         Me.lbReady.AutoSize = True
         Me.lbReady.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold)
         Me.lbReady.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lbReady.Location = New System.Drawing.Point(156, 116)
+        Me.lbReady.Location = New System.Drawing.Point(146, 115)
         Me.lbReady.Name = "lbReady"
         Me.lbReady.Size = New System.Drawing.Size(119, 15)
         Me.lbReady.TabIndex = 124
@@ -449,7 +449,7 @@ Partial Class CLTimer
         '
         'tmrCountDown
         '
-        Me.tmrCountDown.Interval = 1000
+        Me.tmrCountDown.Interval = 10
         '
         'tbError
         '
@@ -541,9 +541,9 @@ Partial Class CLTimer
         '
         'tbStart
         '
-        Me.tbStart.Location = New System.Drawing.Point(234, 115)
+        Me.tbStart.Location = New System.Drawing.Point(216, 115)
         Me.tbStart.Name = "tbStart"
-        Me.tbStart.Size = New System.Drawing.Size(30, 20)
+        Me.tbStart.Size = New System.Drawing.Size(55, 20)
         Me.tbStart.TabIndex = 118
         Me.tbStart.TabStop = False
         Me.tbStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
