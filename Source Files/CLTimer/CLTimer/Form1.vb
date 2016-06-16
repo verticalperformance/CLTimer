@@ -232,23 +232,23 @@ Loop1:
 
     End Sub
 
-    Sub Countdown(DisplayToUse As String) 'Called by tmrCountDown every second
+    'Sub Countdown(DisplayToUse As String) 'Called by tmrCountDown every second
 
-        StartCount = StartCount - 1
-        tbStart.Text = FormatSecondsToMinutes(StartCount)
+    '    StartCount = StartCount - 1
+    '    tbStart.Text = FormatSecondsToMinutes(StartCount)
 
-        If StartCount > 0 Then
-            DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(StartCount)
-            With SerialPort1
-                .Write(DataOut)
-            End With
-            DataOut = ""
+    '    If StartCount > 0 Then
+    '        DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(StartCount)
+    '        With SerialPort1
+    '            .Write(DataOut)
+    '        End With
+    '        DataOut = ""
 
-        Else
-            StartRace()
-        End If
+    '    Else
+    '        StartRace()
+    '    End If
 
-    End Sub
+    'End Sub
 
     Sub TimerDisplayCount(DisplayToUse As String, deltaSeconds As Integer, updateMaster As Boolean)
         ' Increment/decrement the display and master clock
@@ -271,9 +271,7 @@ Loop1:
         End Select
 
     End Sub
-
     Sub ShowSecondsOnDisplay(DisplayToUse As String, Seconds As Integer)
-
         tbStart.Text = FormatSecondsToMinutes(Seconds) ' Show on PC
         Select Case DisplayToUse.Substring(0, 1)
             Case "A" To "C"
@@ -283,11 +281,7 @@ Loop1:
                 End With
                 DataOut = ""
         End Select
-
-
     End Sub
-
-
 
     Function FormatSecondsToMinutesInDisplayFormat(Seconds As Integer) As String
 
@@ -300,7 +294,6 @@ Loop1:
         FormatSecondsToMinutesInDisplayFormat = "///" & tmpMinutes & tmpSeconds & "/"
 
     End Function
-
     Function FormatSecondsToMinutes(Seconds As Integer) As String
 
         Dim tsSeconds = TimeSpan.FromSeconds(Seconds)
@@ -310,23 +303,6 @@ Loop1:
         FormatSecondsToMinutes = tmpMinutes & ":" & tmpSeconds
 
     End Function
-
-
-    Private Sub tmrCountDown_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCountDown.Tick
-        '1 Sec timer, IncTime is True once every second
-
-        Dim elapsedTicks As Long = Now.Ticks - ticPreviousSecond
-        Dim elapsedSpan As New TimeSpan(elapsedTicks)
-
-        If elapsedSpan.TotalSeconds >= 1 Then
-            IncTime = True
-            ticPreviousSecond = Now.Ticks
-        Else
-            IncTime = False
-        End If
-
-
-    End Sub
 
 
     Sub StartRace()
@@ -402,7 +378,6 @@ Loop1:
         UpDisplay = False
 
     End Sub
-
     Sub Running()
         Dim X, y As Integer
         Dim char1 As String
@@ -469,7 +444,6 @@ Loop1:
 
 
     End Sub
-
 
     Sub DoLane1()
 
@@ -685,7 +659,8 @@ Loop1:
         End If
 
     End Sub
-    Sub bnSetup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnSetup.Click
+
+    Private Sub bnSetup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnSetup.Click
         Dim Doit As Boolean = True
 
         If SaveIt = True Then
@@ -733,63 +708,6 @@ Loop1:
         End If
 
     End Sub
-
-
-    Private Sub tmrCommsOK_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCommsOK.Tick
-        '3 secs time, used for monitoring data receive from timers. Gets reset while racing if other data received.
-        ' While idle, handle "X" in from timers and send "X" out to displays for keep alive
-
-        Dim char1 As String
-        Dim x As Integer        'length of string
-        Dim y As Integer = 0    'current char in string
-
-        If RunState = "Racing" Then 'don't read serial port
-        Else
-            ReadIn1() 'read serial port
-            x = DataIn.Length
-            If x = 0 Then
-                DataOk = False
-            End If
-            While y < x             ' handle all char's received seperately
-                char1 = DataIn.Substring(y, 1)
-                If InStr("X", char1) Then
-                    DataOk = True
-                End If
-                y = y + 1
-            End While
-        End If
-
-        If DataOk Then           'During race, Watch should get incremented every second
-            RcvData.BackColor = Color.LightGreen
-        End If
-
-        ClockData = "X"
-        With SerialPort1
-            If .IsOpen Then .Write(ClockData)
-        End With
-
-    End Sub
-
-    Private Sub SetFormControlsToInRaceState(Racing As Boolean)
-        ' Disable all non race controls when racing = true
-        ' Enable when false
-
-        If Racing Then
-            TestDisplay.Enabled = False
-            TestHorn.Enabled = False
-            TestSwitches.Enabled = False
-            bnExit.Enabled = False
-        Else
-            TestDisplay.Enabled = True
-            TestHorn.Enabled = True
-            TestSwitches.Enabled = True
-            bnExit.Enabled = True
-        End If
-
-
-    End Sub
-
-
     Private Sub bnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnStart.Click
         Dim RaceGo As Boolean = False
 
@@ -827,7 +745,8 @@ Loop1:
                     ElseIf StartState = "Manual" Then
                         StartCount = 0
                         tmrCountDown.Start()
-                        SetDisplay0()               'Set displays to 00 for manual start
+                        SetDisplayToZeroLapsAndTime()               'Set displays to 00 for manual start
+                        'SetDisplayToZeroLapsWithTimer(CountDownTimerDisplay)  ' Rat race
                         RunState = "WaitStartPress"
                         bnStart.Text = "Reset Display"
                         Ln1CurrLap = 0
@@ -865,37 +784,7 @@ Loop1:
             MessageBox.Show("Not Receiving Data from Timers")
         End If
     End Sub
-
-    Sub SetDisplayAsTimer(InitialTime As Integer, DisplayToUse As String)
-        'Setup display A,B or C to InitialTimeValue
-        DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(InitialTime)
-        With SerialPort1
-            .Write(DataOut)
-        End With
-
-    End Sub
-
-
-
-    Sub SetDisplay0()           'Manual start Laps = 0, Time = 0:00.0
-        DataOut = "A//0/0000"
-        With SerialPort1
-            .Write(DataOut)
-        End With
-        DataOut = "B//0/0000"
-        With SerialPort1
-            .Write(DataOut)
-        End With
-        DataOut = "C//0/0000"
-        With SerialPort1
-            .Write(DataOut)
-        End With
-    End Sub
-
-
-
-
-    Sub bnClearDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnClearDisplay.Click
+    Private Sub bnClearDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnClearDisplay.Click
 
         Dim Str1 As String = ""
         Dim Str2 As String = ""
@@ -937,6 +826,59 @@ Loop1:
         End If
 
     End Sub
+
+    Private Sub SetFormControlsToInRaceState(Racing As Boolean)
+        ' Disable all non race controls when racing = true
+        ' Enable when false
+
+        If Racing Then
+            TestDisplay.Enabled = False
+            TestHorn.Enabled = False
+            TestSwitches.Enabled = False
+            bnExit.Enabled = False
+        Else
+            TestDisplay.Enabled = True
+            TestHorn.Enabled = True
+            TestSwitches.Enabled = True
+            bnExit.Enabled = True
+        End If
+
+
+    End Sub
+
+    Sub SetDisplayAsTimer(InitialTime As Integer, DisplayToUse As String)
+        'Setup display A,B or C to InitialTimeValue
+        DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(InitialTime)
+        With SerialPort1
+            .Write(DataOut)
+        End With
+
+    End Sub
+    Sub SetDisplayToZeroLapsAndTime()           'Manual start Laps = 0, Time = 0:00.0
+        For i As Integer = 0 To 2
+            DataOut = Chr(i + 65) & "//0/0000"
+            With SerialPort1
+                .Write(DataOut)
+            End With
+        Next
+
+    End Sub
+    Sub SetDisplayToZeroLapsWithTimer(DisplayToUse As String)           'Used to setup display with zero laps, and a single timer (eg for ratrace)
+        Dim timerString As String
+
+        For i As Integer = 0 To 2
+            If i + 65 = Asc(DisplayToUse) Then
+                timerString = "000/"
+            Else
+                timerString = "////"
+            End If
+            DataOut = Chr(i + 65) & "//0/" & timerString
+            With SerialPort1
+                .Write(DataOut)
+            End With
+        Next
+    End Sub
+
     Sub ManStart()
         If Ln1State = "Ready" Then
             StartRace()
@@ -964,7 +906,6 @@ Loop1:
         Loop
         tmrCommsOK.Start()
     End Sub
-
     Sub WaitY() 'wait 0.3 secs
 
         Dim t_stop As Integer
@@ -982,18 +923,68 @@ Loop1:
             CurrTime = CurrTime / 100
         Loop
     End Sub
-    'Sub DoRcv()     'Received an "Z" from the remote transmitter
-
-    '    If Watch < 3 Then     'watch gets decremented by timer3 every 200mS
-    '        Watch = Watch + 12   '  
-    '    End If
-    'End Sub
 
     Sub ReadIn1() '(ByVal datain As String)
         DataIn = ""
         With SerialPort1
             If .IsOpen Then DataIn = .ReadExisting()
         End With
+    End Sub
+
+    Private Sub tmrCommsOK_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCommsOK.Tick
+        '3 secs time, used for monitoring data receive from timers. Gets reset while racing if other data received.
+        ' While idle, handle "X" in from timers and send "X" out to displays for keep alive
+
+        Dim char1 As String
+        Dim x As Integer        'length of string
+        Dim y As Integer = 0    'current char in string
+
+        If RunState = "Racing" Then 'don't read serial port
+        Else
+            ReadIn1() 'read serial port
+            x = DataIn.Length
+            If x = 0 Then
+                DataOk = False
+            End If
+            While y < x             ' handle all char's received seperately
+                char1 = DataIn.Substring(y, 1)
+                If InStr("X", char1) Then
+                    DataOk = True
+                End If
+                y = y + 1
+            End While
+        End If
+
+        If DataOk Then           'During race, Watch should get incremented every second
+            RcvData.BackColor = Color.LightGreen
+        End If
+
+        ClockData = "X"
+        With SerialPort1
+            If .IsOpen Then .Write(ClockData)
+        End With
+
+    End Sub
+    Private Sub tmrCountDown_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCountDown.Tick
+        '1 Sec timer, IncTime is True once every second
+
+        Dim elapsedTicks As Long = Now.Ticks - ticPreviousSecond
+        Dim elapsedSpan As New TimeSpan(elapsedTicks)
+
+        If elapsedSpan.TotalSeconds >= 1 Then
+            IncTime = True
+            ticPreviousSecond = Now.Ticks
+        Else
+            IncTime = False
+        End If
+
+
+    End Sub
+    Private Sub tmrConsXmitDelay_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrConsXmitDelay.Tick
+        ' Used to delay xmit of consecutive updates to display
+        UpDisplay = True
+        tmrConsXmitDelay.Stop()
+
     End Sub
 
     Sub SetNoInHeat()
@@ -1021,8 +1012,6 @@ Loop1:
 
 
     End Sub
-
-
     Sub ClearFm()
 
         StateLn1.Clear()
@@ -1045,13 +1034,6 @@ Loop1:
 
     End Sub
 
-
-    Private Sub tmrConsXmitDelay_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrConsXmitDelay.Tick
-        ' Used to delay xmit of consecutive updates to display
-        UpDisplay = True
-        tmrConsXmitDelay.Stop()
-
-    End Sub
 
     Private Sub SwitchTestTimerTick(sender As System.Object, e As System.EventArgs) Handles tmrRedSw.Tick, tmrGrnSw.Tick, tmrAmbSw.Tick, tmrStarterSw.Tick
         If sender Is tmrRedSw Then
@@ -1117,7 +1099,6 @@ Loop1:
     End Sub
 
     Private Sub AdjustDisplayBrightness_Click(sender As System.Object, e As System.EventArgs) Handles IncDisplay.Click, DecDisplay.Click
-
         If sender Is IncDisplay Then
             If D_Level < 6 Then
                 D_Level = D_Level + 1
@@ -1196,7 +1177,6 @@ Loop1:
 
     End Sub
 
-
     Private Sub tbError_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tbError.Click
         tbError.Text = ""           'received a wrong bit of data at the receiver, just clear it...
         tbError.BackColor = Color.LightGray
@@ -1262,7 +1242,6 @@ Loop1:
         End With
 
     End Sub
-
     Private Sub EndSwitchTest()
 
         SwTest = False
@@ -1277,7 +1256,6 @@ Loop1:
 
 
     End Sub
-
 
     Private Sub TestHorn_Click(sender As System.Object, e As System.EventArgs) Handles TestHorn.Click
         With SerialPort1
@@ -1332,7 +1310,6 @@ endsub:
     Private Sub HELPToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HELPToolStripMenuItem1.Click
         MsgBox("Port number of the serial port, used for communicating with the Lap Counter switches and to send UHF data to the clock. The default is 5")
     End Sub
-
 
     Private Sub CLOCKSTARTToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CLOCKSTARTToolStripMenuItem.Click
         'Start using computer and display    

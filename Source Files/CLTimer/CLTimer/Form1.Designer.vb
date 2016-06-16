@@ -440,7 +440,7 @@ Partial Class CLTimer
         Me.lbReady.AutoSize = True
         Me.lbReady.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold)
         Me.lbReady.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lbReady.Location = New System.Drawing.Point(146, 115)
+        Me.lbReady.Location = New System.Drawing.Point(146, 116)
         Me.lbReady.Name = "lbReady"
         Me.lbReady.Size = New System.Drawing.Size(119, 15)
         Me.lbReady.TabIndex = 124
