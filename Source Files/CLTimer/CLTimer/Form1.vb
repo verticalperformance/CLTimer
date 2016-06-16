@@ -106,8 +106,8 @@ Public Class CLTimer
         RcvData.BackColor = Color.Red
 
         radHeat.Checked = True  ' Default to heat distance on startup
-        bnStart.Enabled = False
-        bnClearDisplay.Enabled = False
+        bnStartRace.Enabled = False
+        bnNextRace.Enabled = False
 
         On Error Resume Next
         With SerialPort1
@@ -138,7 +138,8 @@ Public Class CLTimer
         myRaces.ReadRaceClassesFromFile(RaceClassesFileName) 'Read the race class file into the data model
 
         PopulateRaceListBox()
-
+        EnableRaceNotCompleteControls(False)
+        bnSetupRace.Focus()
 
     End Sub
 
@@ -163,7 +164,7 @@ Public Class CLTimer
     Private Sub CloseCLTimer()
         ' Shutdown events
         tmrCommsOK.Stop()
-        tmrCountDown.Stop()
+        tmrSecondsCounter.Stop()
         tmrConsXmitDelay.Stop()
         With SerialPort1
             If .IsOpen Then
@@ -213,8 +214,8 @@ Loop1:
                 If Done Then                'end of race
                     tmrConsXmitDelay.Stop()
                     RunState = "Finished"
-                    bnStart.Enabled = False
-                    bnClearDisplay.Enabled = True
+                    bnStartRace.Enabled = False
+                    bnNextRace.Enabled = True
                     SetupToolStripMenuItem.Enabled = True
                     radHeat.Enabled = True
                     radFinal.Enabled = True
@@ -349,20 +350,22 @@ Loop1:
         StateLn3.Text = "Racing"
         StateLn3.BackColor = Color.LightGreen
         tbStart.BackColor = Color.White
-        bnStart.BackColor = Color.Silver
+        bnStartRace.BackColor = Color.Silver
 
-        bnStart.Enabled = False
-        bnClearDisplay.Enabled = False
+        bnStartRace.Enabled = False
+        bnNextRace.Enabled = False
         radHeat.Enabled = False
         radFinal.Enabled = False
         ClassName.Enabled = False
 
+        EnableRaceNotCompleteControls(True)
+
 
         If StartState = "Auto" Then
-            bnStart.Text = "Start Countdown"
+            bnStartRace.Text = "Racing"
 
         Else
-            bnStart.Text = "Setup Display"      'StartState = "Manual"
+            bnStartRace.Text = "Racing"      'StartState = "Manual"
             lbReady.Visible = False
         End If
 
@@ -654,13 +657,14 @@ Loop1:
             Update2 = False
             Update3 = False
 
-            bnClearDisplay.Focus()
+            DisplayControlsForStartType()
+            bnNextRace.Focus()
 
         End If
 
     End Sub
 
-    Private Sub bnSetup_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnSetup.Click
+    Private Sub bnSetupRace_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnSetupRace.Click
         Dim Doit As Boolean = True
 
         If SaveIt = True Then
@@ -674,28 +678,30 @@ Loop1:
                 ClearFm()               'clear all text boxes from previous race
                 Clear_Display()             'clear the last results
                 SetNoInHeat()               'now just sets up screen
-                bnStart.Enabled = True
-                bnSetup.Enabled = False
-                bnClearDisplay.Enabled = False
+                bnStartRace.Enabled = True
+                bnSetupRace.Enabled = False
+                bnNextRace.Enabled = False
 
                 'SetupToolStripMenuItem.Enabled = False
 
-                bnStart.Focus()
+                bnStartRace.Focus()
 
                 RunState = "WaitStart"
 
                 ' Reset the warmup/cooldown times
                 StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
 
+                ClkLabel.Visible = True
+                tbStart.Visible = True
 
                 If StartState = "Auto" Then
-                    ClkLabel.Visible = True
-                    tbStart.Visible = True
+                    SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
                     tbStart.Text = FormatSecondsToMinutes(StartCount)
                     lbReady.Visible = False
                 Else
-                    ClkLabel.Visible = False
-                    tbStart.Visible = False
+                    'ClkLabel.Visible = False
+                    'tbStart.Visible = False
+                    tbStart.Text = FormatSecondsToMinutes(0)
 
                 End If
 
@@ -708,7 +714,7 @@ Loop1:
         End If
 
     End Sub
-    Private Sub bnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnStart.Click
+    Private Sub bnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnStartRace.Click
         Dim RaceGo As Boolean = False
 
         If SwTest Then
@@ -730,13 +736,13 @@ Loop1:
                         SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
                         ticPreviousSecond = Now.Ticks
 
-                        tmrCountDown.Start()
+                        tmrSecondsCounter.Start()
                         tmrCommsOK.Stop()
                         RunState = "AutoStart"
-                        bnStart.Text = "Stop CountDown"
+                        bnStartRace.Text = "Stop CountDown"
                         ClkLabel.Visible = True
                         tbStart.Visible = True
-                        bnStart.BackColor = Color.LightGreen
+                        bnStartRace.BackColor = Color.LightGreen
                         Ln1CurrLap = 0
                         Ln2CurrLap = 0
                         Ln3CurrLap = 0
@@ -744,11 +750,11 @@ Loop1:
 
                     ElseIf StartState = "Manual" Then
                         StartCount = 0
-                        tmrCountDown.Start()
+                        tmrSecondsCounter.Start()
                         SetDisplayToZeroLapsAndTime()               'Set displays to 00 for manual start
                         'SetDisplayToZeroLapsWithTimer(CountDownTimerDisplay)  ' Rat race
                         RunState = "WaitStartPress"
-                        bnStart.Text = "Reset Display"
+                        bnStartRace.Text = "Clear and Reset"
                         Ln1CurrLap = 0
                         Ln2CurrLap = 0
                         Ln3CurrLap = 0
@@ -761,22 +767,23 @@ Loop1:
 
                     SetFormControlsToInRaceState(False)
 
-                    tmrCountDown.Stop()
+                    tmrSecondsCounter.Stop()
                     tmrCommsOK.Start()
                     RunState = "WaitStart"
 
-                    bnStart.Text = "Start Countdown"
-                    bnStart.BackColor = Color.Silver
+                    bnStartRace.Text = "Start Countdown"
+                    bnStartRace.BackColor = Color.Silver
                     tbStart.Text = FormatSecondsToMinutes(StartCount)
-                    Clear_Display()
+                    SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
+                    'Clear_Display()
 
                 Case "WaitStartPress"       'quit waiting for starter
 
                     SetFormControlsToInRaceState(False)
-                    tmrCountDown.Stop()
+                    tmrSecondsCounter.Stop()
 
                     Clear_Display()
-                    bnStart.Text = "Setup Display"
+                    bnStartRace.Text = "Prepare for Start"
                     lbReady.Visible = False
                     RunState = "WaitStart"
             End Select
@@ -784,7 +791,7 @@ Loop1:
             MessageBox.Show("Not Receiving Data from Timers")
         End If
     End Sub
-    Private Sub bnClearDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnClearDisplay.Click
+    Private Sub bnNextRace_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnNextRace.Click
 
         Dim Str1 As String = ""
         Dim Str2 As String = ""
@@ -815,12 +822,12 @@ Loop1:
             RunState = "Idle"
 
             SetFormControlsToInRaceState(False)
+            EnableRaceNotCompleteControls(False)
 
-            bnClearDisplay.Enabled = False
-            bnSetup.Enabled = True
-            bnSetup.Focus()
+            bnNextRace.Enabled = False
+            bnSetupRace.Enabled = True
+            bnSetupRace.Focus()
             'bnExit.Enabled = True
-
         Else
             MessageBox.Show("Not All Finished")
         End If
@@ -833,11 +840,13 @@ Loop1:
 
         If Racing Then
             TestDisplay.Enabled = False
+            ClearDisplayBoardOnly.Enabled = False
             TestHorn.Enabled = False
             TestSwitches.Enabled = False
             bnExit.Enabled = False
         Else
             TestDisplay.Enabled = True
+            ClearDisplayBoardOnly.Enabled = True
             TestHorn.Enabled = True
             TestSwitches.Enabled = True
             bnExit.Enabled = True
@@ -845,6 +854,22 @@ Loop1:
 
 
     End Sub
+
+    Private Sub EnableRaceNotCompleteControls(Enable As Boolean)
+
+        Rerun1.Enabled = Enable
+        Rerun2.Enabled = Enable
+        Rerun3.Enabled = Enable
+        DNF1.Enabled = Enable
+        DNF2.Enabled = Enable
+        DNF3.Enabled = Enable
+        DQ1.Enabled = Enable
+        DQ2.Enabled = Enable
+        DQ3.Enabled = Enable
+
+    End Sub
+
+
 
     Sub SetDisplayAsTimer(InitialTime As Integer, DisplayToUse As String)
         'Setup display A,B or C to InitialTimeValue
@@ -965,7 +990,7 @@ Loop1:
         End With
 
     End Sub
-    Private Sub tmrCountDown_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCountDown.Tick
+    Private Sub tmrCountDown_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrSecondsCounter.Tick
         '1 Sec timer, IncTime is True once every second
 
         Dim elapsedTicks As Long = Now.Ticks - ticPreviousSecond
@@ -1246,11 +1271,10 @@ Loop1:
 
         SwTest = False
         tbRedSw.Clear()
-        tbRedSw.Visible = False
-        tbGrnSw.Visible = False
-        tbAmbSw.Visible = False
-        tbstarter.Visible = False
-        TestSwitches.Text = "Test Switches"
+        tbGrnSw.Clear()
+        tbAmbSw.Clear()
+        tbstarter.Clear()
+        TestSwitches.Text = "Test"
         TestSwitches.BackColor = Color.LightGray
         tmrCommsOK.Start()
 
@@ -1329,19 +1353,17 @@ endsub:
             Case "Auto"
                 CLOCKSTARTToolStripMenuItem.Checked = True
                 ManualStartToolStripMenuItem1.Checked = False
-                bnStart.Text = ("Start Countdown")
+                bnStartRace.Text = ("Start Countdown")
                 lbReady.Visible = False
                 ClkLabel.Visible = True
                 tbStart.Visible = True
-                tbStart.Text = FormatSecondsToMinutes(StartCount)
 
             Case "Manual"
                 ManualStartToolStripMenuItem1.Checked = True
                 CLOCKSTARTToolStripMenuItem.Checked = False
-                bnStart.Text = ("Setup Displays")
-                bnSetup.Text = ("Setup Screen")
-                ClkLabel.Visible = False
-                tbStart.Visible = False
+                bnStartRace.Text = ("Prepare for Start")
+                ClkLabel.Visible = True
+                tbStart.Visible = True
 
         End Select
     End Sub
@@ -1383,6 +1405,22 @@ endsub:
         End If
         AllDone()   'check if all have finished
     End Sub
+    Private Sub DQ_Click(sender As System.Object, e As System.EventArgs) Handles DQ1.Click, DQ2.Click, DQ3.Click
+        If sender Is DQ1 Then
+            Ln1State = "Finished"
+            StateLn1.BackColor = Color.LightSkyBlue
+            StateLn1.Text = "DQ"
+        ElseIf sender Is DQ2 Then
+            Ln2State = "Finished"
+            StateLn2.BackColor = Color.LightSkyBlue
+            StateLn2.Text = "DQ"
+        ElseIf sender Is DQ3 Then
+            Ln3State = "Finished"
+            StateLn3.BackColor = Color.LightSkyBlue
+            StateLn3.Text = "DQ"
+        End If
+        AllDone()   'check if all have finished
+    End Sub
 
     Private Sub radHeatFinal_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles radHeat.CheckedChanged, radFinal.CheckedChanged
         If sender Is radHeat Then
@@ -1407,6 +1445,12 @@ endsub:
             RaceFormat.Text = FinalLaps.ToString
         End If
     End Sub
+
+    Private Sub bnClearDisplayBoardOnly_Click(sender As System.Object, e As System.EventArgs) Handles ClearDisplayBoardOnly.Click
+        Clear_Display()
+    End Sub
+
+
 End Class
 
 
