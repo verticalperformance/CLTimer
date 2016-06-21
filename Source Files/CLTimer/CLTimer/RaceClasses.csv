@@ -1,10 +1,14 @@
-Class,Heat,Final,Type
-F2C,100,200,Laps
-Classic FAI,100,200,Laps
-Vintage A,80,160,Laps
-Bendix,80,160,Laps
-Classic B,70,140,Laps
-Vintage B,70,140,Laps
-Open Rat Race,70,140,Laps
-Rat Race,10,20,Minutes
-Junior Rat Race,5,10,Minutes
+Class,Heat,Final,Type,WarmUp,CoolDown
+F2C,100,200,Laps,90,30
+Classic FAI,100,200,Laps,90,30
+Vintage A,80,160,Laps,90,30
+Bendix,80,160,Laps,90,30
+Classic B,70,140,Laps,90,30
+Vintage B,70,140,Laps,90,30
+Open Rat Race,70,140,Laps,90,30
+Rat Race,10,20,Minutes,90,30
+Junior Rat Race,5,10,Minutes,90,30
+Test,5,10,Laps,10,5
+Practice 5 Mins,0,0,Laps,300,0
+Practice 10 Mins,0,0,Laps,600,0
+

@@ -39,8 +39,6 @@ Partial Class CLTimer
         Me.Com2ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Com3ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Com4ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ClkLabel = New System.Windows.Forms.Label()
-        Me.bnStartRace = New System.Windows.Forms.Button()
         Me.Lane1 = New System.Windows.Forms.GroupBox()
         Me.DQ1 = New System.Windows.Forms.Button()
         Me.Rerun1 = New System.Windows.Forms.Button()
@@ -60,23 +58,17 @@ Partial Class CLTimer
         Me.Lane3Laps = New System.Windows.Forms.TextBox()
         Me.DNF3 = New System.Windows.Forms.Button()
         Me.StateLn3 = New System.Windows.Forms.TextBox()
-        Me.lbReady = New System.Windows.Forms.Label()
         Me.tmrSecondsCounter = New System.Windows.Forms.Timer(Me.components)
         Me.tbError = New System.Windows.Forms.TextBox()
         Me.SetupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DNF2 = New System.Windows.Forms.Button()
         Me.StateLn2 = New System.Windows.Forms.TextBox()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
-        Me.bnNextRace = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.DQ2 = New System.Windows.Forms.Button()
-        Me.bnSetupRace = New System.Windows.Forms.Button()
-        Me.tbStart = New System.Windows.Forms.TextBox()
         Me.tmrCommsOK = New System.Windows.Forms.Timer(Me.components)
         Me.tmrConsXmitDelay = New System.Windows.Forms.Timer(Me.components)
         Me.bnExit = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.RaceFormat = New System.Windows.Forms.TextBox()
         Me.tmrRedSw = New System.Windows.Forms.Timer(Me.components)
         Me.tmrGrnSw = New System.Windows.Forms.Timer(Me.components)
         Me.tmrAmbSw = New System.Windows.Forms.Timer(Me.components)
@@ -101,11 +93,19 @@ Partial Class CLTimer
         Me.TestHorn = New System.Windows.Forms.Button()
         Me.TestDisplay = New System.Windows.Forms.Button()
         Me.RcvData = New System.Windows.Forms.TextBox()
-        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
-        Me.radFinal = New System.Windows.Forms.RadioButton()
-        Me.radHeat = New System.Windows.Forms.RadioButton()
-        Me.ClassName = New System.Windows.Forms.ComboBox()
+        Me.tbStart = New System.Windows.Forms.TextBox()
+        Me.lbReady = New System.Windows.Forms.Label()
+        Me.bnNextRace = New System.Windows.Forms.Button()
+        Me.bnStartRace = New System.Windows.Forms.Button()
+        Me.bnSetupRace = New System.Windows.Forms.Button()
+        Me.ClkLabel = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.RaceFormat = New System.Windows.Forms.TextBox()
         Me.Label5 = New System.Windows.Forms.Label()
+        Me.ClassName = New System.Windows.Forms.ComboBox()
+        Me.radHeat = New System.Windows.Forms.RadioButton()
+        Me.radFinal = New System.Windows.Forms.RadioButton()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
         Me.Lane1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -235,30 +235,6 @@ Partial Class CLTimer
         Me.Com4ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
         Me.Com4ToolStripMenuItem.Text = "COM4"
         '
-        'ClkLabel
-        '
-        Me.ClkLabel.AutoSize = True
-        Me.ClkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
-        Me.ClkLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.ClkLabel.Location = New System.Drawing.Point(137, 80)
-        Me.ClkLabel.Name = "ClkLabel"
-        Me.ClkLabel.Size = New System.Drawing.Size(70, 13)
-        Me.ClkLabel.TabIndex = 121
-        Me.ClkLabel.Text = "Clock Time"
-        Me.ClkLabel.Visible = False
-        '
-        'bnStartRace
-        '
-        Me.bnStartRace.BackColor = System.Drawing.Color.Silver
-        Me.bnStartRace.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
-        Me.bnStartRace.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.bnStartRace.Location = New System.Drawing.Point(9, 109)
-        Me.bnStartRace.Name = "bnStartRace"
-        Me.bnStartRace.Size = New System.Drawing.Size(121, 30)
-        Me.bnStartRace.TabIndex = 2
-        Me.bnStartRace.Text = "Start Countdown"
-        Me.bnStartRace.UseVisualStyleBackColor = False
-        '
         'Lane1
         '
         Me.Lane1.BackColor = System.Drawing.Color.Firebrick
@@ -381,7 +357,7 @@ Partial Class CLTimer
         Me.GroupBox2.Controls.Add(Me.Lane3Laps)
         Me.GroupBox2.Controls.Add(Me.DNF3)
         Me.GroupBox2.Controls.Add(Me.StateLn3)
-        Me.GroupBox2.Location = New System.Drawing.Point(299, 292)
+        Me.GroupBox2.Location = New System.Drawing.Point(299, 297)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(286, 123)
         Me.GroupBox2.TabIndex = 112
@@ -469,18 +445,6 @@ Partial Class CLTimer
         Me.StateLn3.TabStop = False
         Me.StateLn3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'lbReady
-        '
-        Me.lbReady.AutoSize = True
-        Me.lbReady.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.lbReady.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lbReady.Location = New System.Drawing.Point(137, 115)
-        Me.lbReady.Name = "lbReady"
-        Me.lbReady.Size = New System.Drawing.Size(119, 15)
-        Me.lbReady.TabIndex = 124
-        Me.lbReady.Text = "Ready For Starter"
-        Me.lbReady.Visible = False
-        '
         'tmrSecondsCounter
         '
         Me.tmrSecondsCounter.Interval = 10
@@ -529,21 +493,9 @@ Partial Class CLTimer
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional
-        Me.MenuStrip1.Size = New System.Drawing.Size(601, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(594, 24)
         Me.MenuStrip1.TabIndex = 125
         Me.MenuStrip1.Text = "MenuStrip1"
-        '
-        'bnNextRace
-        '
-        Me.bnNextRace.BackColor = System.Drawing.Color.Silver
-        Me.bnNextRace.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
-        Me.bnNextRace.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.bnNextRace.Location = New System.Drawing.Point(9, 145)
-        Me.bnNextRace.Name = "bnNextRace"
-        Me.bnNextRace.Size = New System.Drawing.Size(121, 30)
-        Me.bnNextRace.TabIndex = 3
-        Me.bnNextRace.Text = "Next Race"
-        Me.bnNextRace.UseVisualStyleBackColor = False
         '
         'GroupBox1
         '
@@ -556,7 +508,7 @@ Partial Class CLTimer
         Me.GroupBox1.Controls.Add(Me.Lane2laps)
         Me.GroupBox1.Controls.Add(Me.DNF2)
         Me.GroupBox1.Controls.Add(Me.StateLn2)
-        Me.GroupBox1.Location = New System.Drawing.Point(299, 156)
+        Me.GroupBox1.Location = New System.Drawing.Point(299, 162)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(286, 123)
         Me.GroupBox1.TabIndex = 111
@@ -571,28 +523,6 @@ Partial Class CLTimer
         Me.DQ2.TabIndex = 9
         Me.DQ2.Text = "DQ"
         Me.DQ2.UseVisualStyleBackColor = True
-        '
-        'bnSetupRace
-        '
-        Me.bnSetupRace.BackColor = System.Drawing.Color.Silver
-        Me.bnSetupRace.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
-        Me.bnSetupRace.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.bnSetupRace.Location = New System.Drawing.Point(9, 73)
-        Me.bnSetupRace.Name = "bnSetupRace"
-        Me.bnSetupRace.Size = New System.Drawing.Size(121, 30)
-        Me.bnSetupRace.TabIndex = 1
-        Me.bnSetupRace.Text = "Setup Race"
-        Me.bnSetupRace.UseVisualStyleBackColor = False
-        '
-        'tbStart
-        '
-        Me.tbStart.Location = New System.Drawing.Point(217, 77)
-        Me.tbStart.Name = "tbStart"
-        Me.tbStart.Size = New System.Drawing.Size(55, 20)
-        Me.tbStart.TabIndex = 118
-        Me.tbStart.TabStop = False
-        Me.tbStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.tbStart.Visible = False
         '
         'tmrCommsOK
         '
@@ -611,28 +541,6 @@ Partial Class CLTimer
         Me.bnExit.TabIndex = 114
         Me.bnExit.Text = "Exit"
         Me.bnExit.UseVisualStyleBackColor = True
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(9, 16)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(48, 20)
-        Me.Label1.TabIndex = 30
-        Me.Label1.Text = "Class"
-        '
-        'RaceFormat
-        '
-        Me.RaceFormat.BackColor = System.Drawing.Color.LightGray
-        Me.RaceFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RaceFormat.Location = New System.Drawing.Point(161, 45)
-        Me.RaceFormat.Name = "RaceFormat"
-        Me.RaceFormat.Size = New System.Drawing.Size(67, 26)
-        Me.RaceFormat.TabIndex = 126
-        Me.RaceFormat.TabStop = False
-        Me.RaceFormat.Text = "xxx"
-        Me.RaceFormat.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'tmrRedSw
         '
@@ -662,7 +570,7 @@ Partial Class CLTimer
         Me.gbSystem.Controls.Add(Me.RcvData)
         Me.gbSystem.Location = New System.Drawing.Point(12, 27)
         Me.gbSystem.Name = "gbSystem"
-        Me.gbSystem.Size = New System.Drawing.Size(281, 221)
+        Me.gbSystem.Size = New System.Drawing.Size(281, 211)
         Me.gbSystem.TabIndex = 139
         Me.gbSystem.TabStop = False
         Me.gbSystem.Text = "System"
@@ -862,6 +770,140 @@ Partial Class CLTimer
         Me.RcvData.Text = "Lap Counter Communication Status"
         Me.RcvData.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
+        'tbStart
+        '
+        Me.tbStart.Location = New System.Drawing.Point(217, 77)
+        Me.tbStart.Name = "tbStart"
+        Me.tbStart.Size = New System.Drawing.Size(55, 20)
+        Me.tbStart.TabIndex = 118
+        Me.tbStart.TabStop = False
+        Me.tbStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.tbStart.Visible = False
+        '
+        'lbReady
+        '
+        Me.lbReady.AutoSize = True
+        Me.lbReady.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.lbReady.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lbReady.Location = New System.Drawing.Point(137, 115)
+        Me.lbReady.Name = "lbReady"
+        Me.lbReady.Size = New System.Drawing.Size(119, 15)
+        Me.lbReady.TabIndex = 124
+        Me.lbReady.Text = "Ready For Starter"
+        Me.lbReady.Visible = False
+        '
+        'bnNextRace
+        '
+        Me.bnNextRace.BackColor = System.Drawing.Color.Silver
+        Me.bnNextRace.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
+        Me.bnNextRace.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.bnNextRace.Location = New System.Drawing.Point(9, 145)
+        Me.bnNextRace.Name = "bnNextRace"
+        Me.bnNextRace.Size = New System.Drawing.Size(121, 30)
+        Me.bnNextRace.TabIndex = 3
+        Me.bnNextRace.Text = "Next Race"
+        Me.bnNextRace.UseVisualStyleBackColor = False
+        '
+        'bnStartRace
+        '
+        Me.bnStartRace.BackColor = System.Drawing.Color.Silver
+        Me.bnStartRace.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
+        Me.bnStartRace.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.bnStartRace.Location = New System.Drawing.Point(9, 109)
+        Me.bnStartRace.Name = "bnStartRace"
+        Me.bnStartRace.Size = New System.Drawing.Size(121, 30)
+        Me.bnStartRace.TabIndex = 2
+        Me.bnStartRace.Text = "Start Countdown"
+        Me.bnStartRace.UseVisualStyleBackColor = False
+        '
+        'bnSetupRace
+        '
+        Me.bnSetupRace.BackColor = System.Drawing.Color.Silver
+        Me.bnSetupRace.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
+        Me.bnSetupRace.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.bnSetupRace.Location = New System.Drawing.Point(9, 73)
+        Me.bnSetupRace.Name = "bnSetupRace"
+        Me.bnSetupRace.Size = New System.Drawing.Size(121, 30)
+        Me.bnSetupRace.TabIndex = 1
+        Me.bnSetupRace.Text = "Setup Race"
+        Me.bnSetupRace.UseVisualStyleBackColor = False
+        '
+        'ClkLabel
+        '
+        Me.ClkLabel.AutoSize = True
+        Me.ClkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
+        Me.ClkLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.ClkLabel.Location = New System.Drawing.Point(137, 80)
+        Me.ClkLabel.Name = "ClkLabel"
+        Me.ClkLabel.Size = New System.Drawing.Size(70, 13)
+        Me.ClkLabel.TabIndex = 121
+        Me.ClkLabel.Text = "Clock Time"
+        Me.ClkLabel.Visible = False
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(9, 16)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(48, 20)
+        Me.Label1.TabIndex = 30
+        Me.Label1.Text = "Class"
+        '
+        'RaceFormat
+        '
+        Me.RaceFormat.BackColor = System.Drawing.Color.LightGray
+        Me.RaceFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RaceFormat.Location = New System.Drawing.Point(161, 45)
+        Me.RaceFormat.Name = "RaceFormat"
+        Me.RaceFormat.Size = New System.Drawing.Size(67, 26)
+        Me.RaceFormat.TabIndex = 126
+        Me.RaceFormat.TabStop = False
+        Me.RaceFormat.Text = "xxx"
+        Me.RaceFormat.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label5.Location = New System.Drawing.Point(231, 48)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(44, 20)
+        Me.Label5.TabIndex = 127
+        Me.Label5.Text = "Laps"
+        '
+        'ClassName
+        '
+        Me.ClassName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ClassName.FormattingEnabled = True
+        Me.ClassName.Location = New System.Drawing.Point(78, 18)
+        Me.ClassName.Name = "ClassName"
+        Me.ClassName.Size = New System.Drawing.Size(197, 21)
+        Me.ClassName.TabIndex = 128
+        '
+        'radHeat
+        '
+        Me.radHeat.AutoSize = True
+        Me.radHeat.Checked = True
+        Me.radHeat.Location = New System.Drawing.Point(13, 48)
+        Me.radHeat.Name = "radHeat"
+        Me.radHeat.Size = New System.Drawing.Size(48, 17)
+        Me.radHeat.TabIndex = 129
+        Me.radHeat.TabStop = True
+        Me.radHeat.Text = "Heat"
+        Me.radHeat.UseVisualStyleBackColor = True
+        '
+        'radFinal
+        '
+        Me.radFinal.AutoSize = True
+        Me.radFinal.Location = New System.Drawing.Point(80, 48)
+        Me.radFinal.Name = "radFinal"
+        Me.radFinal.Size = New System.Drawing.Size(47, 17)
+        Me.radFinal.TabIndex = 130
+        Me.radFinal.TabStop = True
+        Me.radFinal.Text = "Final"
+        Me.radFinal.UseVisualStyleBackColor = True
+        '
         'GroupBox5
         '
         Me.GroupBox5.Controls.Add(Me.radFinal)
@@ -876,60 +918,18 @@ Partial Class CLTimer
         Me.GroupBox5.Controls.Add(Me.bnNextRace)
         Me.GroupBox5.Controls.Add(Me.lbReady)
         Me.GroupBox5.Controls.Add(Me.tbStart)
-        Me.GroupBox5.Location = New System.Drawing.Point(12, 254)
+        Me.GroupBox5.Location = New System.Drawing.Point(12, 240)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Size = New System.Drawing.Size(281, 181)
         Me.GroupBox5.TabIndex = 140
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "Race Management"
         '
-        'radFinal
-        '
-        Me.radFinal.AutoSize = True
-        Me.radFinal.Location = New System.Drawing.Point(80, 48)
-        Me.radFinal.Name = "radFinal"
-        Me.radFinal.Size = New System.Drawing.Size(47, 17)
-        Me.radFinal.TabIndex = 130
-        Me.radFinal.TabStop = True
-        Me.radFinal.Text = "Final"
-        Me.radFinal.UseVisualStyleBackColor = True
-        '
-        'radHeat
-        '
-        Me.radHeat.AutoSize = True
-        Me.radHeat.Checked = True
-        Me.radHeat.Location = New System.Drawing.Point(13, 48)
-        Me.radHeat.Name = "radHeat"
-        Me.radHeat.Size = New System.Drawing.Size(48, 17)
-        Me.radHeat.TabIndex = 129
-        Me.radHeat.TabStop = True
-        Me.radHeat.Text = "Heat"
-        Me.radHeat.UseVisualStyleBackColor = True
-        '
-        'ClassName
-        '
-        Me.ClassName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ClassName.FormattingEnabled = True
-        Me.ClassName.Location = New System.Drawing.Point(78, 18)
-        Me.ClassName.Name = "ClassName"
-        Me.ClassName.Size = New System.Drawing.Size(197, 21)
-        Me.ClassName.TabIndex = 128
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(231, 48)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(44, 20)
-        Me.Label5.TabIndex = 127
-        Me.Label5.Text = "Laps"
-        '
         'CLTimer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(601, 446)
+        Me.ClientSize = New System.Drawing.Size(594, 431)
         Me.Controls.Add(Me.GroupBox5)
         Me.Controls.Add(Me.gbSystem)
         Me.Controls.Add(Me.Lane1)
@@ -977,8 +977,6 @@ Partial Class CLTimer
     Friend WithEvents Com2ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents Com3ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents Com4ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ClkLabel As System.Windows.Forms.Label
-    Friend WithEvents bnStartRace As System.Windows.Forms.Button
     Friend WithEvents Lane1 As System.Windows.Forms.GroupBox
     Friend WithEvents Rerun1 As System.Windows.Forms.Button
     Friend WithEvents Label2 As System.Windows.Forms.Label
@@ -995,23 +993,17 @@ Partial Class CLTimer
     Friend WithEvents Lane3Laps As System.Windows.Forms.TextBox
     Friend WithEvents DNF3 As System.Windows.Forms.Button
     Friend WithEvents StateLn3 As System.Windows.Forms.TextBox
-    Friend WithEvents lbReady As System.Windows.Forms.Label
     Friend WithEvents tmrSecondsCounter As System.Windows.Forms.Timer
     Friend WithEvents tbError As System.Windows.Forms.TextBox
     Friend WithEvents SetupToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DNF2 As System.Windows.Forms.Button
     Friend WithEvents StateLn2 As System.Windows.Forms.TextBox
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
-    Friend WithEvents bnNextRace As System.Windows.Forms.Button
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents Label24 As System.Windows.Forms.Label
-    Friend WithEvents bnSetupRace As System.Windows.Forms.Button
-    Friend WithEvents tbStart As System.Windows.Forms.TextBox
     Friend WithEvents tmrCommsOK As System.Windows.Forms.Timer
     Friend WithEvents tmrConsXmitDelay As System.Windows.Forms.Timer
     Friend WithEvents bnExit As System.Windows.Forms.Button
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents RaceFormat As System.Windows.Forms.TextBox
     Friend WithEvents tmrRedSw As System.Windows.Forms.Timer
     Friend WithEvents tmrGrnSw As System.Windows.Forms.Timer
     Friend WithEvents tmrAmbSw As System.Windows.Forms.Timer
@@ -1034,15 +1026,23 @@ Partial Class CLTimer
     Friend WithEvents TestHorn As System.Windows.Forms.Button
     Friend WithEvents TestDisplay As System.Windows.Forms.Button
     Friend WithEvents RcvData As System.Windows.Forms.TextBox
-    Friend WithEvents GroupBox5 As System.Windows.Forms.GroupBox
-    Friend WithEvents radFinal As System.Windows.Forms.RadioButton
-    Friend WithEvents radHeat As System.Windows.Forms.RadioButton
-    Friend WithEvents ClassName As System.Windows.Forms.ComboBox
-    Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents ClearDisplayBoardOnly As System.Windows.Forms.Button
     Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
     Friend WithEvents DQ1 As System.Windows.Forms.Button
     Friend WithEvents DQ3 As System.Windows.Forms.Button
     Friend WithEvents DQ2 As System.Windows.Forms.Button
+    Friend WithEvents tbStart As System.Windows.Forms.TextBox
+    Friend WithEvents lbReady As System.Windows.Forms.Label
+    Friend WithEvents bnNextRace As System.Windows.Forms.Button
+    Friend WithEvents bnStartRace As System.Windows.Forms.Button
+    Friend WithEvents bnSetupRace As System.Windows.Forms.Button
+    Friend WithEvents ClkLabel As System.Windows.Forms.Label
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents RaceFormat As System.Windows.Forms.TextBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents ClassName As System.Windows.Forms.ComboBox
+    Friend WithEvents radHeat As System.Windows.Forms.RadioButton
+    Friend WithEvents radFinal As System.Windows.Forms.RadioButton
+    Friend WithEvents GroupBox5 As System.Windows.Forms.GroupBox
 
 End Class
