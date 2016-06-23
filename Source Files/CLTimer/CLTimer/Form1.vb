@@ -93,6 +93,11 @@ Public Class CLTimer
     Public HeatLaps As Integer = 100  ' Defaults are overridden by config file
     Public FinalLaps As Integer = 200
 
+    Public MaxHeatTime As Integer = 6000
+    Public MaxFinalTime As Integer = 9000
+
+    Public RaceType As String = "Laps"
+
     Public RaceClassesFileName As String = "RaceClasses.csv"
     Public myRaces As New Races 'Race Data model
 
@@ -128,7 +133,6 @@ Public Class CLTimer
         'StartState = "Auto"
         StartState = "Manual"
 
-        DisplayControlsForStartType()
         Com3ToolStripMenuItem.Checked = True  ' Need to fix
 
         Dim AppPath As String = Application.StartupPath
@@ -138,6 +142,9 @@ Public Class CLTimer
         myRaces.ReadRaceClassesFromFile(RaceClassesFileName) 'Read the race class file into the data model
 
         PopulateRaceListBox()
+
+        DisplayControlsForStartType()
+
         EnableRaceNotCompleteControls(False)
         bnSetupRace.Focus()
 
@@ -256,7 +263,7 @@ Loop1:
 
         StartCount = StartCount + deltaSeconds
 
-        If updateMaster Then tbStart.Text = FormatSecondsToMinutes(StartCount) 'Update the form master clock if required
+        If updateMaster Then tbClock.Text = FormatSecondsToMinutes(StartCount) 'Update the form master clock if required
 
         Select Case DisplayToUse.Substring(0, 1)
             Case "A" To "C"
@@ -273,7 +280,7 @@ Loop1:
 
     End Sub
     Sub ShowSecondsOnDisplay(DisplayToUse As String, Seconds As Integer)
-        tbStart.Text = FormatSecondsToMinutes(Seconds) ' Show on PC
+        tbClock.Text = FormatSecondsToMinutes(Seconds) ' Show on PC
         Select Case DisplayToUse.Substring(0, 1)
             Case "A" To "C"
                 DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(Seconds) ' Show on Display
@@ -349,7 +356,7 @@ Loop1:
         StateLn2.BackColor = Color.LightGreen
         StateLn3.Text = "Racing"
         StateLn3.BackColor = Color.LightGreen
-        tbStart.BackColor = Color.White
+        tbClock.BackColor = Color.White
         bnStartRace.BackColor = Color.Silver
 
         bnStartRace.Enabled = False
@@ -370,7 +377,7 @@ Loop1:
         End If
 
         ClkLabel.Visible = True
-        tbStart.Visible = True
+        tbClock.Visible = True
 
         'ClkLabel.Visible = False
         'tbStart.Visible = False
@@ -692,16 +699,16 @@ Loop1:
                 StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
 
                 ClkLabel.Visible = True
-                tbStart.Visible = True
+                tbClock.Visible = True
 
                 If StartState = "Auto" Then
                     SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
-                    tbStart.Text = FormatSecondsToMinutes(StartCount)
+                    tbClock.Text = FormatSecondsToMinutes(StartCount)
                     lbReady.Visible = False
                 Else
                     'ClkLabel.Visible = False
                     'tbStart.Visible = False
-                    tbStart.Text = FormatSecondsToMinutes(0)
+                    tbClock.Text = FormatSecondsToMinutes(0)
 
                 End If
 
@@ -741,7 +748,7 @@ Loop1:
                         RunState = "AutoStart"
                         bnStartRace.Text = "Stop CountDown"
                         ClkLabel.Visible = True
-                        tbStart.Visible = True
+                        tbClock.Visible = True
                         bnStartRace.BackColor = Color.LightGreen
                         Ln1CurrLap = 0
                         Ln2CurrLap = 0
@@ -773,9 +780,11 @@ Loop1:
 
                     bnStartRace.Text = "Start Countdown"
                     bnStartRace.BackColor = Color.Silver
-                    tbStart.Text = FormatSecondsToMinutes(StartCount)
+                    Delay = 3
+                    WaitX() ' Pause the clock display a little before reset
+
+                    tbClock.Text = FormatSecondsToMinutes(StartCount)
                     SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
-                    'Clear_Display()
 
                 Case "WaitStartPress"       'quit waiting for starter
 
@@ -925,7 +934,7 @@ Loop1:
             My.Application.DoEvents()
             tim = t_stop - CurrTime
             tim = Format(tim, "##00")
-            tbStart.Text = tim
+            'tbClock.Text = tim
             CurrTime = My.Computer.Clock.TickCount.ToString
             CurrTime = CurrTime / 1000
         Loop
@@ -943,10 +952,12 @@ Loop1:
         Do While t_stop > CurrTime       'wait here
             '  My.Application.DoEvents()   'allow "other stuff"
             tim = t_stop - CurrTime
-            tbStart.Text = tim
+            'tbClock.Text = tim
             CurrTime = My.Computer.Clock.TickCount.ToString
             CurrTime = CurrTime / 100
         Loop
+
+
     End Sub
 
     Sub ReadIn1() '(ByVal datain As String)
@@ -1046,7 +1057,7 @@ Loop1:
         Ln1Time.Clear()
         Ln2Time.Clear()
         Ln3Time.Clear()
-        tbStart.Clear()
+        tbClock.Clear()
         Lane1Laps.Clear()
         Lane2laps.Clear()
         Lane3Laps.Clear()
@@ -1356,15 +1367,16 @@ endsub:
                 bnStartRace.Text = ("Start Countdown")
                 lbReady.Visible = False
                 ClkLabel.Visible = True
-                tbStart.Visible = True
+                tbClock.Visible = True
+                tbClock.Text = FormatSecondsToMinutes(StartCount)
 
             Case "Manual"
                 ManualStartToolStripMenuItem1.Checked = True
                 CLOCKSTARTToolStripMenuItem.Checked = False
                 bnStartRace.Text = ("Prepare for Start")
                 ClkLabel.Visible = True
-                tbStart.Visible = True
-
+                tbClock.Visible = True
+                tbClock.Text = FormatSecondsToMinutes(0)
         End Select
     End Sub
 
@@ -1425,25 +1437,54 @@ endsub:
     Private Sub radHeatFinal_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles radHeat.CheckedChanged, radFinal.CheckedChanged
         If sender Is radHeat Then
             RaceIsAFinal = False
-            RaceFormat.Text = HeatLaps.ToString
             RaceFormat.BackColor = Color.LightGray
+            If RaceType = "Laps" Then
+                RaceFormat.Text = HeatLaps.ToString
+            Else
+                RaceFormat.Text = FormatSecondsToMinutes(MaxHeatTime)
+            End If
         Else
             RaceIsAFinal = True
-            RaceFormat.Text = FinalLaps.ToString
             RaceFormat.BackColor = Color.Salmon
+            If RaceType = "Laps" Then
+                RaceFormat.Text = FinalLaps.ToString
+            Else
+                RaceFormat.Text = FormatSecondsToMinutes(MaxFinalTime)
+            End If
+
         End If
     End Sub
 
     Private Sub ClassName_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles ClassName.SelectedIndexChanged
+
+
         HeatLaps = myRaces.Item(sender.SelectedIndex).HeatDistance
         FinalLaps = myRaces.Item(sender.SelectedIndex).FinalDistance
+        MaxHeatTime = myRaces.Item(sender.SelectedIndex).MaxHeatTime
+        MaxFinalTime = myRaces.Item(sender.SelectedIndex).MaxFinalTime
+
         StartCount = myRaces.Item(sender.SelectedIndex).WarmUpTime + myRaces.Item(sender.SelectedIndex).CoolDownTime
-        tbStart.Text = FormatSecondsToMinutes(StartCount)
-        If radHeat.Checked Then
-            RaceFormat.Text = HeatLaps.ToString
+        tbClock.Text = FormatSecondsToMinutes(StartCount)
+
+        RaceType = myRaces.Item(sender.SelectedIndex).Type
+
+        lblTimeOrDistance.Text = RaceType
+
+        If RaceType = "Laps" Then
+            If radHeat.Checked Then
+                RaceFormat.Text = HeatLaps.ToString
+            Else
+                RaceFormat.Text = FinalLaps.ToString
+            End If
         Else
-            RaceFormat.Text = FinalLaps.ToString
+            If radHeat.Checked Then
+                RaceFormat.Text = FormatSecondsToMinutes(MaxHeatTime)
+            Else
+                RaceFormat.Text = FormatSecondsToMinutes(MaxFinalTime)
+            End If
         End If
+
+
     End Sub
 
     Private Sub bnClearDisplayBoardOnly_Click(sender As System.Object, e As System.EventArgs) Handles ClearDisplayBoardOnly.Click

@@ -93,7 +93,7 @@ Partial Class CLTimer
         Me.TestHorn = New System.Windows.Forms.Button()
         Me.TestDisplay = New System.Windows.Forms.Button()
         Me.RcvData = New System.Windows.Forms.TextBox()
-        Me.tbStart = New System.Windows.Forms.TextBox()
+        Me.tbClock = New System.Windows.Forms.TextBox()
         Me.lbReady = New System.Windows.Forms.Label()
         Me.bnNextRace = New System.Windows.Forms.Button()
         Me.bnStartRace = New System.Windows.Forms.Button()
@@ -101,7 +101,7 @@ Partial Class CLTimer
         Me.ClkLabel = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.RaceFormat = New System.Windows.Forms.TextBox()
-        Me.Label5 = New System.Windows.Forms.Label()
+        Me.lblTimeOrDistance = New System.Windows.Forms.Label()
         Me.ClassName = New System.Windows.Forms.ComboBox()
         Me.radHeat = New System.Windows.Forms.RadioButton()
         Me.radFinal = New System.Windows.Forms.RadioButton()
@@ -770,15 +770,15 @@ Partial Class CLTimer
         Me.RcvData.Text = "Lap Counter Communication Status"
         Me.RcvData.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'tbStart
+        'tbClock
         '
-        Me.tbStart.Location = New System.Drawing.Point(217, 77)
-        Me.tbStart.Name = "tbStart"
-        Me.tbStart.Size = New System.Drawing.Size(55, 20)
-        Me.tbStart.TabIndex = 118
-        Me.tbStart.TabStop = False
-        Me.tbStart.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.tbStart.Visible = False
+        Me.tbClock.Location = New System.Drawing.Point(217, 77)
+        Me.tbClock.Name = "tbClock"
+        Me.tbClock.Size = New System.Drawing.Size(55, 20)
+        Me.tbClock.TabIndex = 118
+        Me.tbClock.TabStop = False
+        Me.tbClock.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.tbClock.Visible = False
         '
         'lbReady
         '
@@ -862,15 +862,15 @@ Partial Class CLTimer
         Me.RaceFormat.Text = "xxx"
         Me.RaceFormat.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
-        'Label5
+        'lblTimeOrDistance
         '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(231, 48)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(44, 20)
-        Me.Label5.TabIndex = 127
-        Me.Label5.Text = "Laps"
+        Me.lblTimeOrDistance.AutoSize = True
+        Me.lblTimeOrDistance.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblTimeOrDistance.Location = New System.Drawing.Point(231, 48)
+        Me.lblTimeOrDistance.Name = "lblTimeOrDistance"
+        Me.lblTimeOrDistance.Size = New System.Drawing.Size(44, 20)
+        Me.lblTimeOrDistance.TabIndex = 127
+        Me.lblTimeOrDistance.Text = "Laps"
         '
         'ClassName
         '
@@ -909,7 +909,7 @@ Partial Class CLTimer
         Me.GroupBox5.Controls.Add(Me.radFinal)
         Me.GroupBox5.Controls.Add(Me.radHeat)
         Me.GroupBox5.Controls.Add(Me.ClassName)
-        Me.GroupBox5.Controls.Add(Me.Label5)
+        Me.GroupBox5.Controls.Add(Me.lblTimeOrDistance)
         Me.GroupBox5.Controls.Add(Me.RaceFormat)
         Me.GroupBox5.Controls.Add(Me.Label1)
         Me.GroupBox5.Controls.Add(Me.ClkLabel)
@@ -917,7 +917,7 @@ Partial Class CLTimer
         Me.GroupBox5.Controls.Add(Me.bnStartRace)
         Me.GroupBox5.Controls.Add(Me.bnNextRace)
         Me.GroupBox5.Controls.Add(Me.lbReady)
-        Me.GroupBox5.Controls.Add(Me.tbStart)
+        Me.GroupBox5.Controls.Add(Me.tbClock)
         Me.GroupBox5.Location = New System.Drawing.Point(12, 240)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Size = New System.Drawing.Size(281, 181)
@@ -1031,7 +1031,7 @@ Partial Class CLTimer
     Friend WithEvents DQ1 As System.Windows.Forms.Button
     Friend WithEvents DQ3 As System.Windows.Forms.Button
     Friend WithEvents DQ2 As System.Windows.Forms.Button
-    Friend WithEvents tbStart As System.Windows.Forms.TextBox
+    Friend WithEvents tbClock As System.Windows.Forms.TextBox
     Friend WithEvents lbReady As System.Windows.Forms.Label
     Friend WithEvents bnNextRace As System.Windows.Forms.Button
     Friend WithEvents bnStartRace As System.Windows.Forms.Button
@@ -1039,7 +1039,7 @@ Partial Class CLTimer
     Friend WithEvents ClkLabel As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents RaceFormat As System.Windows.Forms.TextBox
-    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents lblTimeOrDistance As System.Windows.Forms.Label
     Friend WithEvents ClassName As System.Windows.Forms.ComboBox
     Friend WithEvents radHeat As System.Windows.Forms.RadioButton
     Friend WithEvents radFinal As System.Windows.Forms.RadioButton

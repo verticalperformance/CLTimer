@@ -54,6 +54,24 @@ Public Class Race
             coolDownTimeValue = value
         End Set
     End Property
+    Private maxHeatTimeValue As Integer
+    Public Property MaxHeatTime() As Integer
+        Get
+            Return maxHeatTimeValue
+        End Get
+        Set(ByVal value As Integer)
+            maxHeatTimeValue = value
+        End Set
+    End Property
+    Private maxFinalTimeValue As Integer
+    Public Property MaxFinalTime() As Integer
+        Get
+            Return maxFinalTimeValue
+        End Get
+        Set(ByVal value As Integer)
+            maxFinalTimeValue = value
+        End Set
+    End Property
 End Class
 
 Public Class Races
@@ -111,13 +129,16 @@ Public Class Races
                         myRace.Name = fields(0)
                         myRace.HeatDistance = fields(1)
                         myRace.FinalDistance = fields(2)
-                        myRace.Type = fields(3)
-                        myRace.WarmUpTime = fields(4)
-                        myRace.CoolDownTime = fields(5)
+                        myRace.Type = "Laps"
+                        myRace.WarmUpTime = fields(3)
+                        myRace.CoolDownTime = fields(4)
+                        myRace.MaxHeatTime = fields(5)
+                        myRace.MaxFinalTime = fields(6)
 
-                        If fields(3) = "Minutes" Then   'Fudge Ratrace for the moment
+                        If fields(1) = 0 Then   'Fudge Ratrace distance for the moment
                             myRace.HeatDistance = 999
                             myRace.FinalDistance = 999
+                            myRace.Type = "Mins"
                         End If
 
                         Me.Add(myRace)
@@ -134,6 +155,8 @@ Public Class Races
             myRace.Type = "Laps"
             myRace.WarmUpTime = 90
             myRace.CoolDownTime = 30
+            myRace.MaxHeatTime = 6000
+            myRace.MaxFinalTime = 9000
             Me.Add(myRace)
         End If
 
