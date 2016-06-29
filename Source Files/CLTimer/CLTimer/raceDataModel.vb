@@ -135,14 +135,14 @@ Public Class Races
                         myRace.MaxHeatTime = fields(5)
                         myRace.MaxFinalTime = fields(6)
 
-                        If fields(1) = 0 Then   'Fudge Ratrace distance for the moment
-                            myRace.HeatDistance = 999
-                            myRace.FinalDistance = 999
+                        If fields(1) = 0 Then
+                            '    myRace.HeatDistance = 999 'Fudge Ratrace distance for the moment
+                            '    myRace.FinalDistance = 999
                             myRace.Type = "Mins"
                         End If
 
                         Me.Add(myRace)
-                    End If
+                        End If
                 End While
             End Using
 

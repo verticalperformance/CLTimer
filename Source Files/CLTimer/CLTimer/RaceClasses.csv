@@ -1,4 +1,6 @@
 Class,Heat,Final,WarmUp,CoolDown,MaxHeatTime,MaxFinalTime,MandatoryHeatStops,MandatoryFinalStops
+TestLaps,5,10,10,5,30,60,1,2
+TestTime,0,0,10,5,30,60,1,2
 F2C,100,200,90,30,600,900,0,0
 Classic FAI,100,200,90,30,600,900,2,5
 Goodyear,100,200,90,30,600,900,2,5
@@ -10,7 +12,6 @@ Vintage B,70,140,90,30,0,0,1,2
 Open Rat Race,70,140,90,30,600,900,1,2
 Rat Race,0,0,90,30,600,1200,1,2
 Junior Rat Race,0,0,90,30,300,600,1,2
-Test,5,10,10,5,60,90,1,2
 Practice 5 Mins,0,0,300,0,0,0,0,0
 Practice 10 Mins,0,0,600,0,0,0,0,0
 

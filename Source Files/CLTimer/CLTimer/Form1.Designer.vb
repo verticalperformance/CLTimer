@@ -100,7 +100,7 @@ Partial Class CLTimer
         Me.bnSetupRace = New System.Windows.Forms.Button()
         Me.ClkLabel = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.RaceFormat = New System.Windows.Forms.TextBox()
+        Me.RaceLength = New System.Windows.Forms.TextBox()
         Me.lblTimeOrDistance = New System.Windows.Forms.Label()
         Me.ClassName = New System.Windows.Forms.ComboBox()
         Me.radHeat = New System.Windows.Forms.RadioButton()
@@ -850,17 +850,17 @@ Partial Class CLTimer
         Me.Label1.TabIndex = 30
         Me.Label1.Text = "Class"
         '
-        'RaceFormat
+        'RaceLength
         '
-        Me.RaceFormat.BackColor = System.Drawing.Color.LightGray
-        Me.RaceFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RaceFormat.Location = New System.Drawing.Point(161, 45)
-        Me.RaceFormat.Name = "RaceFormat"
-        Me.RaceFormat.Size = New System.Drawing.Size(67, 26)
-        Me.RaceFormat.TabIndex = 126
-        Me.RaceFormat.TabStop = False
-        Me.RaceFormat.Text = "xxx"
-        Me.RaceFormat.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.RaceLength.BackColor = System.Drawing.Color.LightGray
+        Me.RaceLength.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RaceLength.Location = New System.Drawing.Point(161, 45)
+        Me.RaceLength.Name = "RaceLength"
+        Me.RaceLength.Size = New System.Drawing.Size(67, 26)
+        Me.RaceLength.TabIndex = 126
+        Me.RaceLength.TabStop = False
+        Me.RaceLength.Text = "xxx"
+        Me.RaceLength.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'lblTimeOrDistance
         '
@@ -910,7 +910,7 @@ Partial Class CLTimer
         Me.GroupBox5.Controls.Add(Me.radHeat)
         Me.GroupBox5.Controls.Add(Me.ClassName)
         Me.GroupBox5.Controls.Add(Me.lblTimeOrDistance)
-        Me.GroupBox5.Controls.Add(Me.RaceFormat)
+        Me.GroupBox5.Controls.Add(Me.RaceLength)
         Me.GroupBox5.Controls.Add(Me.Label1)
         Me.GroupBox5.Controls.Add(Me.ClkLabel)
         Me.GroupBox5.Controls.Add(Me.bnSetupRace)
@@ -1038,7 +1038,7 @@ Partial Class CLTimer
     Friend WithEvents bnSetupRace As System.Windows.Forms.Button
     Friend WithEvents ClkLabel As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents RaceFormat As System.Windows.Forms.TextBox
+    Friend WithEvents RaceLength As System.Windows.Forms.TextBox
     Friend WithEvents lblTimeOrDistance As System.Windows.Forms.Label
     Friend WithEvents ClassName As System.Windows.Forms.ComboBox
     Friend WithEvents radHeat As System.Windows.Forms.RadioButton
