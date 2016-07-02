@@ -22,15 +22,15 @@ Imports Microsoft.VisualBasic.FileIO
 
 Public Class CLTimer
 
-    Public CalValue As Double = 0 '0.2     'Cal value. 
+    'Public CalValue As Double = 0 '0.2     'Cal value. 
     Public RunState As String
     Public StartState As String
     Public IncTime As Boolean
-    Public Xmit_str As String
+    'Public Xmit_str As String
     'Public d_no As String
     Public y As Integer
     Public SaveIt As Boolean = False
-    Public raceStartTime As Double
+    'Public raceStartTime As Double
 
     Dim UpDisplay As Boolean
     Dim DataOk As Boolean
@@ -45,45 +45,46 @@ Public Class CLTimer
 
 
     Dim DataIn As String = ""
-    Dim CurrTime As Double
+    'Dim CurrTime As Double
     Dim NoInHeat As Integer
     Dim Ln1State, Ln2State, Ln3State, Ln4State As String
 
     Dim Done As Boolean = False
-    Dim Watch As Integer = 0
+    'Dim Watch As Integer = 0
     Dim RunLoop As Boolean = False
-    Dim Delay As Integer
+    'Dim Delay As Integer
     Dim DataOut As String
-    Dim RaceIsAFinal As Boolean = False       'default is 100 laps
-    Dim NoClock As Boolean = False
+    'Dim RaceIsAFinal As Boolean = False       'default is 100 laps
+    'Dim NoClock As Boolean = False
     Dim SwTest As Boolean = False
     Dim Update1 As Boolean = False
     Dim Update2 As Boolean = False
     Dim Update3 As Boolean = False
     Dim PortNo As String = "COM5"
-    Dim tim8 As Boolean
-    Dim x_count As Integer
-    Dim D_Level As Integer = 6
+    'Dim tim8 As Boolean
+    'Dim x_count As Integer
+    Dim D_Level As Integer = 6  ' Display Brightness Level
 
     Dim StartCount As Integer = 120 ' This is later re-calculated from config data
     Dim CountDownTimerDisplay As String = "A"
 
     'Public tsElapsed = New TimeSpan
+    Dim elapsedSpan As TimeSpan
 
     Public ticPreviousSecond As Long = Now.Ticks  ' Use for the second counter
     Public ticRaceStart As Long = Now.Ticks  ' Use for overall race timing
 
     Dim ClockData As String
 
-    Public sec1 As Double
-    Public sec2 As Double
-    Public temp4 As String
-    Public FinMinutes As Integer
-    Public minint As Integer
-    Public result As String
-    Public resultm As String
-    Public results As String
-    Public SecSize As Integer
+    'Public sec1 As Double
+    'Public sec2 As Double
+    'Public temp4 As String
+    'Public FinMinutes As Integer
+    'Public minint As Integer
+    'Public result As String
+    'Public resultm As String
+    'Public results As String
+    'Public SecSize As Integer
 
     Public HeatLaps As Integer = 100  ' Defaults are overridden by config file
     Public FinalLaps As Integer = 200
@@ -124,7 +125,7 @@ Public Class CLTimer
             End If
         End With
 
-        Delay = 1
+        'Delay = 1
         Clear_Display()
         tmrCommsOK.Start()
         RunState = "Idle"
@@ -190,7 +191,6 @@ Loop1:
             Case "AutoStart"
                 If IncTime Then
                     TimerDisplayCount(CountDownTimerDisplay, -1, True) ' one second or more has elapsed, decrement start counter time
-                    'Countdown(CountDownTimerDisplay)       'tmrCountDown ticked, decrement start time
                     IncTime = False
                 End If
             Case "WaitStartPress"   'Waiting for manual starter switch press
@@ -321,13 +321,13 @@ Loop1:
         ReadIn1()
         DataIn = ""                 'clear timer inputs
 
-        ticRaceStart = Now.Ticks
+        ticRaceStart = Now.Ticks    'Race start time in ticks
         ShowSecondsOnDisplay("X", 0)
 
-        CurrTime = My.Computer.Clock.TickCount.ToString
-        CurrTime = CurrTime / 1000
-        CurrTime = CurrTime + CalValue  'Add cal value so final time is correct
-        raceStartTime = CurrTime      'save start time
+        'CurrTime = My.Computer.Clock.TickCount.ToString
+        'CurrTime = CurrTime / 1000
+        'CurrTime = CurrTime + CalValue  'Add cal value so final time is correct
+        'raceStartTime = CurrTime      'save start time
 
         StateLn1.Text = "Racing"
         StateLn1.BackColor = Color.LightGreen
@@ -370,6 +370,10 @@ Loop1:
     Sub Running()
         Dim X, y As Integer
         Dim char1 As String
+        Dim elapsedTicks As Long = Now.Ticks - ticRaceStart
+        'Dim elapsedSpan As New TimeSpan(elapsedTicks)
+
+        elapsedSpan = New TimeSpan(elapsedTicks)
 
         ReadIn1()               'read serial port 1 (Timers)
         X = DataIn.Length
@@ -377,8 +381,8 @@ Loop1:
         While y < X             ' handle all char's received seperately
             char1 = DataIn.Substring(y, 1)
             If InStr("ABCDX", char1) Then
-                CurrTime = My.Computer.Clock.TickCount.ToString
-                CurrTime = CurrTime / 1000
+                'CurrTime = My.Computer.Clock.TickCount.ToString
+                'CurrTime = CurrTime / 1000
                 Select Case char1
                     Case "A" To "C"
                         DoLane(char1)
@@ -392,19 +396,16 @@ Loop1:
             y = y + 1
         End While
 
-        ' Update the master Clock
-        Dim elapsedTicks As Long = Now.Ticks - ticRaceStart
-        Dim elapsedSpan As New TimeSpan(elapsedTicks)
 
         If RaceDuration > 0 And elapsedSpan.TotalSeconds >= RaceDuration Then 'stop counting after race duration complete
             RaceTimeExceeded()
         End If
 
+        ' Update the master Clock
         If IncTime Then
             ShowSecondsOnDisplay("X", elapsedSpan.TotalSeconds)
             IncTime = False
         End If
-
 
         If UpDisplay Then           'Timer 4 not still running from last xmit to clock (delay between consecutive messages)
             UpdateAllDisplays()
@@ -416,12 +417,9 @@ Loop1:
 
     Private Sub RaceTimeExceeded()
         ShowSecondsOnDisplay("X", RaceDuration)
-
-        CurrTime = My.Computer.Clock.TickCount.ToString
-        CurrTime = CurrTime / 1000
-
+        'CurrTime = My.Computer.Clock.TickCount.ToString
+        ' CurrTime = CurrTime / 1000
         IncTime = False
-
         For i As Integer = Asc("A") To Asc("C")
             DoLane(Chr(i))
         Next
@@ -456,7 +454,7 @@ Loop1:
         Dim laneCurrentLap As Integer = 0
         Dim laneCurrentTimeInSeconds As Double = 0
 
-        laneCurrentTimeInSeconds = (CurrTime - raceStartTime)
+        laneCurrentTimeInSeconds = elapsedSpan.TotalSeconds '(CurrTime - raceStartTime)
 
         Select Case lane
             Case "A"
@@ -486,11 +484,9 @@ Loop1:
     Function UpdateLaneDisplay(lane As String, laneCurrentTimeInSeconds As Double, ByRef laneCurrentLap As Integer, ByRef DisplayLane As String, laneState As TextBox, laneLaps As TextBox, laneTime As TextBox) As Boolean
 
         Dim laneCurrentTimeAsString As String = ""
-
         UpdateLaneDisplay = False
 
         If laneState.Text = "Racing" Then
-
             If RaceDuration > 0 And laneCurrentTimeInSeconds >= RaceDuration Then 'stop counting after race duration complete
                 laneCurrentTimeInSeconds = RaceDuration
                 laneState.Text = "Finished"
@@ -588,7 +584,7 @@ Loop1:
 
     End Sub
     Private Sub bnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnStartRace.Click
-        Dim RaceGo As Boolean = False
+        'Dim RaceGo As Boolean = False
 
         If SwTest Then
             ' Cancel switch testing first
@@ -598,17 +594,13 @@ Loop1:
         ' Reset the warmup/cooldown times
         StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
 
-
         If DataOk Then
             Select Case RunState
                 Case "WaitStart"    '
-
                     SetFormControlsToInRaceState(True)
-
                     If StartState = "Auto" Then
                         SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
                         ticPreviousSecond = Now.Ticks
-
                         tmrSecondsCounter.Start()
                         tmrCommsOK.Stop()
                         RunState = "AutoStart"
@@ -620,7 +612,6 @@ Loop1:
                         Ln2CurrLap = 0
                         Ln3CurrLap = 0
                         Done = False
-
                     ElseIf StartState = "Manual" Then
                         StartCount = 0
                         tmrSecondsCounter.Start()
@@ -646,8 +637,10 @@ Loop1:
 
                     bnStartRace.Text = "Start Countdown"
                     bnStartRace.BackColor = Color.Silver
-                    Delay = 3
-                    WaitX() ' Pause the clock display a little before reset
+
+                    Dim pauseDisplayTime As Double = 3
+                    'Delay = 3
+                    WaitX(pauseDisplayTime) ' Pause the clock display a little before reset
 
                     tbClock.Text = FormatSecondsToMinutes(StartCount)
                     SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
@@ -676,19 +669,17 @@ Loop1:
         Dim results As String = ""
 
         If Done Then
-
             If Ln1State = "Finished" Then
-                Str1 = StateLn1.Text + Chr(9) + Lane1Laps.Text + Chr(9) + Ln1Time.Text + Chr(9) + vbCr + vbLf
+                Str1 = StateLn1.Text + Chr(9) + Lane1Laps.Text + Chr(9) + Ln1Time.Text + Chr(9) + vbNewLine
             End If
             If Ln2State = "Finished" Then
-                Str2 = StateLn2.Text + Chr(9) + Lane2laps.Text + Chr(9) + Ln2Time.Text + Chr(9) + vbCr + vbLf
+                Str2 = StateLn2.Text + Chr(9) + Lane2laps.Text + Chr(9) + Ln2Time.Text + Chr(9) + vbNewLine
             End If
             If Ln3State = "Finished" Then
-                Str3 = StateLn3.Text + Chr(9) + Lane3Laps.Text + Chr(9) + Ln3Time.Text + Chr(9) + vbCr + vbLf
+                Str3 = StateLn3.Text + Chr(9) + Lane3Laps.Text + Chr(9) + Ln3Time.Text + Chr(9) + vbNewLine
             End If
 
-
-            results = Str1 + Str2 + Str3
+            results = Format(Now, "f") + vbNewLine + Str1 + Str2 + Str3
             Clipboard.Clear()
             Clipboard.SetText(results)
 
@@ -784,42 +775,71 @@ Loop1:
 
     End Sub
 
-    Sub WaitX() 'wait time in "Delay" in seconds
-        Dim t_stop As Integer
-        Dim tim As Integer
-        tmrCommsOK.Stop()
-        CurrTime = My.Computer.Clock.TickCount.ToString
-        CurrTime = CurrTime / 1000
-        t_stop = CurrTime + Delay
+    Sub WaitX(Delay As Double) 'wait time in "Delay" in seconds
 
+        Dim ticStart As Long = Now.Ticks
+        Dim waitTime As Double = 0.3
+
+        Dim elapsedSecondsTicks As Long = 0
+        Dim elapsedSecondsSpan As TimeSpan
+
+        tmrCommsOK.Stop()
         RcvData.BackColor = Color.LightGreen 'don't monitor data in for now
 
-        Do While t_stop > CurrTime       'wait here
+        Do
             My.Application.DoEvents()
-            tim = t_stop - CurrTime
-            tim = Format(tim, "##00")
-            'tbClock.Text = tim
-            CurrTime = My.Computer.Clock.TickCount.ToString
-            CurrTime = CurrTime / 1000
-        Loop
+            elapsedSecondsTicks = Now.Ticks - ticStart
+            elapsedSecondsSpan = New TimeSpan(elapsedSecondsTicks)
+        Loop While elapsedSecondsSpan.TotalSeconds <= Delay
+
         tmrCommsOK.Start()
+
+        'Dim t_stop As Integer
+        'Dim tim As Integer
+        'tmrCommsOK.Stop()
+        'CurrTime = My.Computer.Clock.TickCount.ToString
+        'CurrTime = CurrTime / 1000
+        't_stop = CurrTime + Delay
+
+        'RcvData.BackColor = Color.LightGreen 'don't monitor data in for now
+
+        'Do While t_stop > CurrTime       'wait here
+        '    My.Application.DoEvents()
+        '    tim = t_stop - CurrTime
+        '    tim = Format(tim, "##00")
+        '    'tbClock.Text = tim
+        '    CurrTime = My.Computer.Clock.TickCount.ToString
+        '    CurrTime = CurrTime / 1000
+        'Loop
+        'tmrCommsOK.Start()
     End Sub
     Sub WaitY() 'wait 0.3 secs
 
-        Dim t_stop As Integer
-        Dim tim As Integer
+        'Dim t_stop As Integer
+        'Dim tim As Integer
 
-        CurrTime = My.Computer.Clock.TickCount.ToString
-        CurrTime = CurrTime / 100
-        t_stop = CurrTime + 3
+        Dim ticStart As Long = Now.Ticks
+        Dim waitTime As Double = 0.3
 
-        Do While t_stop > CurrTime       'wait here
-            '  My.Application.DoEvents()   'allow "other stuff"
-            tim = t_stop - CurrTime
-            'tbClock.Text = tim
-            CurrTime = My.Computer.Clock.TickCount.ToString
-            CurrTime = CurrTime / 100
-        Loop
+        Dim elapsedSecondsTicks As Long = 0
+        Dim elapsedSecondsSpan As TimeSpan
+
+        Do
+            elapsedSecondsTicks = Now.Ticks - ticStart
+            elapsedSecondsSpan = New TimeSpan(elapsedSecondsTicks)
+        Loop While elapsedSecondsSpan.TotalSeconds <= waitTime
+
+        '        CurrTime = My.Computer.Clock.TickCount.ToString
+        '        CurrTime = CurrTime / 100
+        '       t_stop = CurrTime + 3
+
+        '        Do While t_stop > CurrTime       'wait here
+        '  My.Application.DoEvents()   'allow "other stuff"
+        'tim = t_stop - CurrTime
+        'tbClock.Text = tim
+        '       CurrTime = My.Computer.Clock.TickCount.ToString
+        '      CurrTime = CurrTime / 100
+        '      Loop
 
 
     End Sub
@@ -868,10 +888,10 @@ Loop1:
     Private Sub tmrSecondsCounter_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrSecondsCounter.Tick
         '1 Sec timer, IncTime is True once every second
 
-        Dim elapsedTicks As Long = Now.Ticks - ticPreviousSecond
-        Dim elapsedSpan As New TimeSpan(elapsedTicks)
+        Dim elapsedSecondsTicks As Long = Now.Ticks - ticPreviousSecond
+        Dim elapsedSecondsSpan As New TimeSpan(elapsedSecondsTicks)
 
-        If elapsedSpan.TotalSeconds >= 1 Then
+        If elapsedSecondsSpan.TotalSeconds >= 1 Then
             IncTime = True
             ticPreviousSecond = Now.Ticks
         Else
@@ -977,8 +997,10 @@ Loop1:
                 End With
                 WaitY()
 
-                Delay = 3
-                WaitX()
+                Dim leaveDisplayOnTime As Double = 3
+
+                'Delay = 3
+                WaitX(leaveDisplayOnTime)
                 Clear_Display()
 
                 RcvData.BackColor = Color.Red
@@ -1303,12 +1325,12 @@ endsub:
 
     Private Sub radHeatFinal_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles radHeat.CheckedChanged, radFinal.CheckedChanged
         If sender Is radHeat Then
-            RaceIsAFinal = False
+            'RaceIsAFinal = False
             RaceLength.BackColor = Color.LightGray
             RaceDuration = MaxHeatTime
             RaceDistance = HeatLaps
         Else
-            RaceIsAFinal = True
+            'RaceIsAFinal = True
             RaceLength.BackColor = Color.Salmon
             RaceDuration = MaxFinalTime
             RaceDistance = FinalLaps
