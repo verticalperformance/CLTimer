@@ -152,14 +152,14 @@ Partial Class CLTimer
         'HELPToolStripMenuItem1
         '
         Me.HELPToolStripMenuItem1.Name = "HELPToolStripMenuItem1"
-        Me.HELPToolStripMenuItem1.Size = New System.Drawing.Size(106, 22)
+        Me.HELPToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
         Me.HELPToolStripMenuItem1.Text = "HELP"
         '
         'ManualStartToolStripMenuItem
         '
         Me.ManualStartToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CLOCKSTARTToolStripMenuItem, Me.ManualStartToolStripMenuItem1, Me.HELPToolStripMenuItem3})
         Me.ManualStartToolStripMenuItem.Name = "ManualStartToolStripMenuItem"
-        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.ManualStartToolStripMenuItem.Text = "Start Type"
         '
         'HELPToolStripMenuItem3
@@ -171,13 +171,13 @@ Partial Class CLTimer
         'Com6ToolStripMenuItem
         '
         Me.Com6ToolStripMenuItem.Name = "Com6ToolStripMenuItem"
-        Me.Com6ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.Com6ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.Com6ToolStripMenuItem.Text = "COM6"
         '
         'Com5ToolStripMenuItem
         '
         Me.Com5ToolStripMenuItem.Name = "Com5ToolStripMenuItem"
-        Me.Com5ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.Com5ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.Com5ToolStripMenuItem.Text = "COM5"
         '
         'Lane2laps
@@ -204,35 +204,35 @@ Partial Class CLTimer
         '
         Me.SetPortNoToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Com1ToolStripMenuItem, Me.Com2ToolStripMenuItem, Me.Com3ToolStripMenuItem, Me.Com4ToolStripMenuItem, Me.Com5ToolStripMenuItem, Me.Com6ToolStripMenuItem, Me.HELPToolStripMenuItem1})
         Me.SetPortNoToolStripMenuItem.Name = "SetPortNoToolStripMenuItem"
-        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.SetPortNoToolStripMenuItem.Text = "Set Port 1 No."
         '
         'Com1ToolStripMenuItem
         '
         Me.Com1ToolStripMenuItem.Name = "Com1ToolStripMenuItem"
         Me.Com1ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com1ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.Com1ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.Com1ToolStripMenuItem.Text = "COM1"
         '
         'Com2ToolStripMenuItem
         '
         Me.Com2ToolStripMenuItem.Name = "Com2ToolStripMenuItem"
         Me.Com2ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com2ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.Com2ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.Com2ToolStripMenuItem.Text = "COM2"
         '
         'Com3ToolStripMenuItem
         '
         Me.Com3ToolStripMenuItem.Name = "Com3ToolStripMenuItem"
         Me.Com3ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com3ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.Com3ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.Com3ToolStripMenuItem.Text = "COM3"
         '
         'Com4ToolStripMenuItem
         '
         Me.Com4ToolStripMenuItem.Name = "Com4ToolStripMenuItem"
         Me.Com4ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com4ToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.Com4ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.Com4ToolStripMenuItem.Text = "COM4"
         '
         'Lane1
