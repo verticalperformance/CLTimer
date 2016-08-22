@@ -58,6 +58,8 @@ Public Class CLTimer
     Dim StartCount As Integer = 120 ' This is later re-calculated from config data
     Dim CountDownTimerDisplay As String = "A"
 
+    Dim LaneTimerDisplay As String = CountDownTimerDisplay
+
     Dim elapsedSpan As TimeSpan
 
     Public ticPreviousSecond As Long = Now.Ticks  ' Use for the second counter
@@ -79,7 +81,7 @@ Public Class CLTimer
     Public RaceClassesFileName As String = "RaceClasses.csv"
     Public myRaces As New Races 'Race Data model
 
-    Dim SerialPort1 As IO.Ports.SerialPort = New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
+    Dim SerialPort1 As IO.Ports.SerialPort '= New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
     Public Enum WhatToDisplay
         LapsAndTime
         Laps
@@ -98,6 +100,9 @@ Public Class CLTimer
 
         GetSettings()
 
+        SerialPort1 = New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
+
+
         InitialiseVariables()
 
         StateLn1.BackColor = Color.LightYellow
@@ -109,6 +114,15 @@ Public Class CLTimer
         bnStartRace.Enabled = False
         bnNextRace.Enabled = False
 
+
+
+        Clear_Display()
+        tmrCommsOK.Start()
+        RunState = "Idle"
+
+        CreateComPortStripMenu()
+        SelectComPortStripMenuByName(PortNo)
+
         On Error Resume Next
         With SerialPort1
             .Open()
@@ -117,21 +131,9 @@ Public Class CLTimer
         End With
         With SerialPort1
             If .IsOpen = False Then
-                MsgBox("Com Port " + PortNo + " Not Found")
+                MsgBox("Com Port " + PortNo + " Not Found" + vbNewLine + "Select another Com Port from the menu")
             End If
         End With
-
-        Clear_Display()
-        tmrCommsOK.Start()
-        RunState = "Idle"
-        'StartState = "Auto"
-        'StartState = "Manual"
-
-        Com3ToolStripMenuItem.Checked = True  ' Need to fix
-
-
-        'CreateComPortStripMenu()
-
 
         Dim AppPath As String = Application.StartupPath
 
@@ -328,30 +330,16 @@ Loop1:
     End Function
     Sub StartRace()
 
-        'tmrCountDown.Stop()
         RunState = "Racing"
+        ResetLane()
+        SetLaneLapTextToZero()
+        SetLaneTimeTextToZero()
 
         If RaceType = "Laps" Then
-            SetAllCurrentLapsToZero()
+            SetDisplayToZeroLapsAndTime()
         Else
-            SetDisplayToZeroLapsWithTimer(CountDownTimerDisplay)  ' Rat race
+            SetDisplayToZeroLapsWithTimer(LaneTimerDisplay)  ' Rat race
         End If
-
- 
-        'DataOut = "A//0/0000"
-        'With SerialPort1
-        '    .Write(DataOut)
-        'End With
-
-        'DataOut = "B//0/0000"
-        'With SerialPort1
-        '    .Write(DataOut)
-        'End With
-
-        'DataOut = "C//0/0000"
-        'With SerialPort1
-        '    .Write(DataOut)
-        'End With
 
         DataOut = "S"           'turn start sounder on
         With SerialPort1
@@ -361,22 +349,24 @@ Loop1:
         ReadIn1()
         DataIn = ""                 'clear timer inputs
 
+        ticPreviousSecond = Now.Ticks
+
         ticRaceStart = Now.Ticks    'Race start time in ticks
         ShowSecondsOnDisplay("X", 0)
 
-        'CurrTime = My.Computer.Clock.TickCount.ToString
-        'CurrTime = CurrTime / 1000
-        'CurrTime = CurrTime + CalValue  'Add cal value so final time is correct
-        'raceStartTime = CurrTime      'save start time
+        For i = 0 To numberOfLanes - 1
+            lnState(i) = "Racing"
+        Next
 
-        StateLn1.Text = "Racing"
+        StateLn1.Text = lnState(0)
         StateLn1.BackColor = Color.LightGreen
-        StateLn2.Text = "Racing"
+        StateLn2.Text = lnState(1)
         StateLn2.BackColor = Color.LightGreen
-        StateLn3.Text = "Racing"
+        StateLn3.Text = lnState(2)
         StateLn3.BackColor = Color.LightGreen
         tbClock.BackColor = Color.White
         bnStartRace.BackColor = Color.Silver
+
 
         bnStartRace.Enabled = False
         bnNextRace.Enabled = False
@@ -445,12 +435,12 @@ Loop1:
             ShowSecondsOnDisplay("X", currentTime)
             ' if race type is time based
             If RaceType = "Mins" Then
-                Dim lnNumber = Asc(CountDownTimerDisplay) - 65 'A == 0
+                Dim lnNumber = Asc(LaneTimerDisplay) - 65 'A == 0
                 Dim lnStatus As Windows.Forms.TextBox = Nothing
                 Dim lnLaps As Windows.Forms.TextBox = Nothing
                 Dim lnTime As Windows.Forms.TextBox = Nothing
 
-                Select Case CountDownTimerDisplay
+                Select Case LaneTimerDisplay
                     Case "A"
                         lnStatus = StateLn1
                         lnLaps = Lane1Laps
@@ -459,14 +449,14 @@ Loop1:
                         lnStatus = StateLn2
                         lnLaps = Lane2laps
                         lnTime = Ln2Time
-                     Case "C"
+                    Case "C"
                         lnStatus = StateLn3
                         lnLaps = Lane3Laps
                         lnTime = Ln3Time
                     Case Else
                         'Ignore, should never get here, trap error
                 End Select
-                lnUpdateDisplay(lnNumber) = UpdateLaneDisplay(CountDownTimerDisplay, currentTime, lnCurrLap(lnNumber), lnDisplay(lnNumber), lnStatus, lnLaps, lnTime, WhatToDisplay.LapsAndTime, False)
+                lnUpdateDisplay(lnNumber) = UpdateLaneDisplay(LaneTimerDisplay, currentTime, lnCurrLap(lnNumber), lnDisplay(lnNumber), lnStatus, lnLaps, lnTime, WhatToDisplay.LapsAndTime, False)
 
             End If
 
@@ -494,7 +484,6 @@ Loop1:
         AllDone()
 
     End Sub
-
 
     Private Sub UpdateAllDisplays()
 
@@ -598,15 +587,15 @@ Loop1:
     Sub AllDone() ' check if all have finished
         Select Case NoInHeat
             Case 1
-                If lnState(0) = "Finished" Then Done = True
+                If lnState(0) <> "Racing" Then Done = True
             Case 2
-                If lnState(0) = "Finished" Then
-                    If lnState(1) = "Finished" Then Done = True
+                If lnState(0) <> "Racing" Then
+                    If lnState(1) <> "Racing" Then Done = True
                 End If
             Case 3
-                If lnState(0) = "Finished" Then
-                    If lnState(1) = "Finished" Then
-                        If lnState(2) = "Finished" Then Done = True
+                If lnState(0) <> "Racing" Then
+                    If lnState(1) <> "Racing" Then
+                        If lnState(2) <> "Racing" Then Done = True
                     End If
                 End If
         End Select
@@ -619,9 +608,11 @@ Loop1:
 
     End Sub
 
-    Private Sub SetAllCurrentLapsToZero()
+    Private Sub ResetLane()
         For i = 0 To numberOfLanes - 1
             lnCurrLap(i) = 0
+            lnCurrTime(i) = 0
+            lnState(i) = ""
         Next
     End Sub
 
@@ -651,6 +642,8 @@ Loop1:
 
                 ' Reset the warmup/cooldown times
                 StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
+
+                LaneTimerDisplay = "A"
 
                 ClkLabel.Visible = True
                 tbClock.Visible = True
@@ -700,58 +693,57 @@ Loop1:
                         ClkLabel.Visible = True
                         tbClock.Visible = True
                         bnStartRace.BackColor = Color.LightGreen
-                        If RaceType = "Laps" Then
-                            SetAllCurrentLapsToZero()
-                        Else
-                            SetDisplayToZeroLapsWithTimer(CountDownTimerDisplay)  ' Rat race
-                        End If
+                        ResetLane()
                         Done = False
                     ElseIf StartState = "Manual" Then
                         StartCount = 0
+                        ticPreviousSecond = Now.Ticks
                         tmrSecondsCounter.Start()
-                        SetDisplayToZeroLapsAndTime()               'Set displays to 00 for manual start
-
+                        '                       SetDisplayToZeroLapsAndTime()               'Set displays to 00 for manual start
 
                         RunState = "WaitStartPress"
                         bnStartRace.Text = "Clear and Reset"
 
+                        ResetLane()
+                        SetLaneLapTextToZero()
+                        SetLaneTimeTextToZero()
                         If RaceType = "Laps" Then
-                            SetAllCurrentLapsToZero()
+                            SetDisplayToZeroLapsAndTime()
                         Else
-                            SetDisplayToZeroLapsWithTimer(CountDownTimerDisplay)  ' Rat race
+                             SetDisplayToZeroLapsWithTimer(LaneTimerDisplay)  ' Rat race
                         End If
 
                         Done = False
                         lbReady.Visible = True
                         lbReady.BackColor = Color.LightGreen
-                        End If
+                    End If
 
                 Case "AutoStart"        'Cancel auto start count down
 
-                        SetFormControlsToInRaceState(False)
+                    SetFormControlsToInRaceState(False)
 
-                        tmrSecondsCounter.Stop()
-                        tmrCommsOK.Start()
-                        RunState = "WaitStart"
+                    tmrSecondsCounter.Stop()
+                    tmrCommsOK.Start()
+                    RunState = "WaitStart"
 
-                        bnStartRace.Text = "Start Countdown"
-                        bnStartRace.BackColor = Color.Silver
+                    bnStartRace.Text = "Start Countdown"
+                    bnStartRace.BackColor = Color.Silver
 
-                        Dim pauseDisplayTime As Double = 3
-                        WaitX(pauseDisplayTime) ' Pause the clock display a little before reset
+                    Dim pauseDisplayTime As Double = 3
+                    WaitX(pauseDisplayTime) ' Pause the clock display a little before reset
 
-                        tbClock.Text = FormatSecondsToMinutes(StartCount)
-                        SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
+                    tbClock.Text = FormatSecondsToMinutes(StartCount)
+                    SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
 
                 Case "WaitStartPress"       'quit waiting for starter
 
-                        SetFormControlsToInRaceState(False)
-                        tmrSecondsCounter.Stop()
+                    SetFormControlsToInRaceState(False)
+                    tmrSecondsCounter.Stop()
 
-                        Clear_Display()
-                        bnStartRace.Text = "Prepare for Start"
-                        lbReady.Visible = False
-                        RunState = "WaitStart"
+                    Clear_Display()
+                    bnStartRace.Text = "Prepare for Start"
+                    lbReady.Visible = False
+                    RunState = "WaitStart"
             End Select
         Else
             MessageBox.Show("Not Receiving Data from Timers")
@@ -766,37 +758,38 @@ Loop1:
         Dim Str5 As String = ""
         Dim results As String = ""
 
-        If Done Then
-            If lnState(0) = "Finished" Then
-                Str1 = StateLn1.Text + Chr(9) + Lane1Laps.Text + Chr(9) + Ln1Time.Text + Chr(9) + vbNewLine
-            End If
-            If lnState(1) = "Finished" Then
-                Str2 = StateLn2.Text + Chr(9) + Lane2laps.Text + Chr(9) + Ln2Time.Text + Chr(9) + vbNewLine
-            End If
-            If lnState(2) = "Finished" Then
-                Str3 = StateLn3.Text + Chr(9) + Lane3Laps.Text + Chr(9) + Ln3Time.Text + Chr(9) + vbNewLine
-            End If
+        Dim RaceFinishTime As String = Format(Now, "f")
 
-            results = Format(Now, "f") + vbNewLine + Str1 + Str2 + Str3
-            Clipboard.Clear()
-            Clipboard.SetText(results)
+        Dim LineID As String = RaceFinishTime + Chr(9) + ClassName.SelectedItem + Chr(9)
 
-            SaveIt = False
-            Clear_Display()
-            RunState = "Idle"
-
-            SetFormControlsToInRaceState(False)
-            EnableRaceNotCompleteControls(False)
-
-            bnNextRace.Enabled = False
-            bnSetupRace.Enabled = True
-            bnSetupRace.Focus()
-            DisplayControlsForStartType()
-            'bnExit.Enabled = True
+        If radHeat.Checked = True Then
+            LineID = LineID + "Heat" + Chr(9)
         Else
-            MessageBox.Show("Not All Finished")
+            LineID = LineID + "Final" + Chr(9)
         End If
 
+
+        Str1 = LineID + "Red" + Chr(9) + StateLn1.Text + Chr(9) + Lane1Laps.Text + Chr(9) + Ln1Time.Text + Chr(9) + vbNewLine
+        Str2 = LineID + "Green" + Chr(9) + StateLn2.Text + Chr(9) + Lane2laps.Text + Chr(9) + Ln2Time.Text + Chr(9) + vbNewLine
+        Str3 = LineID + "Yellow" + Chr(9) + StateLn3.Text + Chr(9) + Lane3Laps.Text + Chr(9) + Ln3Time.Text + Chr(9) + vbNewLine
+
+        results = Str1 + Str2 + Str3
+        Clipboard.Clear()
+        Clipboard.SetText(results)
+
+        SaveIt = False
+        Clear_Display()
+        RunState = "Idle"
+
+        SetFormControlsToInRaceState(False)
+        EnableRaceNotCompleteControls(False)
+
+        bnNextRace.Enabled = False
+        bnSetupRace.Enabled = True
+        bnSetupRace.Focus()
+        DisplayControlsForStartType()
+        'bnExit.Enabled = True
+ 
     End Sub
 
     Private Sub SetFormControlsToInRaceState(Racing As Boolean)
@@ -1053,6 +1046,16 @@ Loop1:
 
     End Sub
 
+    Private Sub SetLaneLapTextToZero()
+        Lane1Laps.Text = "0"
+        Lane2laps.Text = "0"
+        Lane3Laps.Text = "0"
+    End Sub
+    Private Sub SetLaneTimeTextToZero()
+        Ln1Time.Text = "0:00.00"
+        Ln2Time.Text = "0:00.00"
+        Ln3Time.Text = "0:00.00"
+    End Sub
 
     Private Sub SwitchTestTimerTick(sender As System.Object, e As System.EventArgs) Handles tmrRedSw.Tick, tmrGrnSw.Tick, tmrAmbSw.Tick, tmrStarterSw.Tick
         If sender Is tmrRedSw Then
@@ -1289,7 +1292,9 @@ Loop1:
     End Sub
 
 
-    Sub CreateComPortStripMenu()
+    Private Sub CreateComPortStripMenu()
+
+        SetPortNoToolStripMenuItem.DropDownItems.Clear()
 
         Dim tsMenuItem As ToolStripMenuItem
 
@@ -1298,19 +1303,30 @@ Loop1:
             tsMenuItem = SetPortNoToolStripMenuItem.DropDownItems.Add(sp)
             tsMenuItem.Tag = sp.Substring(3, sp.Length - 3)
             tsMenuItem.Name = sp
+            AddHandler tsMenuItem.Click, AddressOf ComToolStripMenuItem_Click
+
         Next
 
 
         tsMenuItem = SetPortNoToolStripMenuItem.DropDownItems.Add("HELP")
         tsMenuItem.Name = "HELPCOMToolStripMenuItem"
+        AddHandler tsMenuItem.Click, AddressOf HELPToolStripMenuItem1_Click
 
 
 
     End Sub
 
+    Private Sub SelectComPortStripMenuByName(Name As String)
+        For Each tsMenuItem As ToolStripMenuItem In SetPortNoToolStripMenuItem.DropDownItems
+            If tsMenuItem.Name = Name Then
+                tsMenuItem.Checked = True
+            Else
+                tsMenuItem.Checked = False
+            End If
+        Next
+    End Sub
 
-
-    Private Sub ComToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Com1ToolStripMenuItem.Click, Com2ToolStripMenuItem.Click, Com3ToolStripMenuItem.Click, Com4ToolStripMenuItem.Click, Com5ToolStripMenuItem.Click, Com6ToolStripMenuItem.Click
+    Private Sub ComToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         UnCheckComportMenuItems()
         sender.checked = True
@@ -1349,7 +1365,7 @@ endsub:
         Next
     End Sub
 
-    Private Sub HELPToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HELPToolStripMenuItem1.Click
+    Private Sub HELPToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         MsgBox("Port number of the serial port, used for communicating with the Lap Counter switches and to send UHF data to the clock. The default is 5")
     End Sub
 
@@ -1400,10 +1416,18 @@ endsub:
             lnState(0) = "Finished"
             StateLn1.BackColor = Color.LightSkyBlue
             StateLn1.Text = "DNF"
+            If lnState(1) <> "Finished" Then
+                LaneTimerDisplay = "B"
+            Else
+                LaneTimerDisplay = "C"
+            End If
         ElseIf sender Is DNF2 Then
             lnState(1) = "Finished"
             StateLn2.BackColor = Color.LightSkyBlue
             StateLn2.Text = "DNF"
+            If lnState(2) <> "Finished" Then
+                LaneTimerDisplay = "C"
+            End If
         ElseIf sender Is DNF3 Then
             lnState(2) = "Finished"
             StateLn3.BackColor = Color.LightSkyBlue
@@ -1416,10 +1440,18 @@ endsub:
             lnState(0) = "Finished"
             StateLn1.BackColor = Color.LightSkyBlue
             StateLn1.Text = "RR"
+            If lnState(1) <> "Finished" Then
+                LaneTimerDisplay = "B"
+            Else
+                LaneTimerDisplay = "C"
+            End If
         ElseIf sender Is Rerun2 Then
             lnState(1) = "Finished"
             StateLn2.BackColor = Color.LightSkyBlue
             StateLn2.Text = "RR"
+            If lnState(2) <> "Finished" Then
+                LaneTimerDisplay = "C"
+            End If
         ElseIf sender Is Rerun3 Then
             lnState(2) = "Finished"
             StateLn3.BackColor = Color.LightSkyBlue
@@ -1432,10 +1464,18 @@ endsub:
             lnState(0) = "Finished"
             StateLn1.BackColor = Color.LightSkyBlue
             StateLn1.Text = "DQ"
+            If lnState(1) <> "Finished" Then
+                LaneTimerDisplay = "B"
+            Else
+                LaneTimerDisplay = "C"
+            End If
         ElseIf sender Is DQ2 Then
             lnState(1) = "Finished"
             StateLn2.BackColor = Color.LightSkyBlue
             StateLn2.Text = "DQ"
+            If lnState(2) <> "Finished" Then
+                LaneTimerDisplay = "C"
+            End If
         ElseIf sender Is DQ3 Then
             lnState(2) = "Finished"
             StateLn3.BackColor = Color.LightSkyBlue

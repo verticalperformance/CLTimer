@@ -72,8 +72,17 @@ Public Class Race
             maxFinalTimeValue = value
         End Set
     End Property
-End Class
+    Private maxSpeedValue As Single
+    Public Property MaxSpeed() As Single
+        Get
+            Return maxSpeedValue
+        End Get
+        Set(ByVal value As Single)
+            maxSpeedValue = value
+        End Set
+    End Property
 
+End Class
 Public Class Races
     Inherits System.Collections.CollectionBase
     ' Restricts to Race types, items that can be added to the collection.
@@ -134,15 +143,14 @@ Public Class Races
                         myRace.CoolDownTime = fields(4)
                         myRace.MaxHeatTime = fields(5)
                         myRace.MaxFinalTime = fields(6)
+                        myRace.MaxSpeed = fields(7)
 
                         If fields(1) = 0 Then
-                            '    myRace.HeatDistance = 999 'Fudge Ratrace distance for the moment
-                            '    myRace.FinalDistance = 999
                             myRace.Type = "Mins"
                         End If
 
                         Me.Add(myRace)
-                        End If
+                    End If
                 End While
             End Using
 
@@ -157,6 +165,7 @@ Public Class Races
             myRace.CoolDownTime = 30
             myRace.MaxHeatTime = 6000
             myRace.MaxFinalTime = 9000
+            myRace.MaxSpeed = 0.0
             Me.Add(myRace)
         End If
 

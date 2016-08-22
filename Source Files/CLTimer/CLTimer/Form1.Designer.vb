@@ -23,22 +23,16 @@ Partial Class CLTimer
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(CLTimer))
         Me.Label4 = New System.Windows.Forms.Label()
         Me.ManualStartToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.Ln2Time = New System.Windows.Forms.TextBox()
         Me.CLOCKSTARTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.HELPToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ManualStartToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HELPToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Com6ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Com5ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Lane2laps = New System.Windows.Forms.TextBox()
         Me.Lane1Laps = New System.Windows.Forms.TextBox()
         Me.SetPortNoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Com1ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Com2ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Com3ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Com4ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Lane1 = New System.Windows.Forms.GroupBox()
         Me.DQ1 = New System.Windows.Forms.Button()
         Me.Rerun1 = New System.Windows.Forms.Button()
@@ -106,6 +100,12 @@ Partial Class CLTimer
         Me.radHeat = New System.Windows.Forms.RadioButton()
         Me.radFinal = New System.Windows.Forms.RadioButton()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Ln1Speed = New System.Windows.Forms.TextBox()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.Ln2Speed = New System.Windows.Forms.TextBox()
+        Me.Label9 = New System.Windows.Forms.Label()
+        Me.Ln3Speed = New System.Windows.Forms.TextBox()
         Me.Lane1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -121,7 +121,7 @@ Partial Class CLTimer
         Me.Label4.AutoSize = True
         Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label4.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label4.Location = New System.Drawing.Point(103, 26)
+        Me.Label4.Location = New System.Drawing.Point(104, 13)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(44, 20)
         Me.Label4.TabIndex = 13
@@ -136,7 +136,7 @@ Partial Class CLTimer
         'Ln2Time
         '
         Me.Ln2Time.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln2Time.Location = New System.Drawing.Point(169, 68)
+        Me.Ln2Time.Location = New System.Drawing.Point(169, 50)
         Me.Ln2Time.Name = "Ln2Time"
         Me.Ln2Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln2Time.TabIndex = 12
@@ -148,12 +148,6 @@ Partial Class CLTimer
         Me.CLOCKSTARTToolStripMenuItem.Name = "CLOCKSTARTToolStripMenuItem"
         Me.CLOCKSTARTToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
         Me.CLOCKSTARTToolStripMenuItem.Text = "Display Countdown"
-        '
-        'HELPToolStripMenuItem1
-        '
-        Me.HELPToolStripMenuItem1.Name = "HELPToolStripMenuItem1"
-        Me.HELPToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
-        Me.HELPToolStripMenuItem1.Text = "HELP"
         '
         'ManualStartToolStripMenuItem
         '
@@ -168,22 +162,10 @@ Partial Class CLTimer
         Me.HELPToolStripMenuItem3.Size = New System.Drawing.Size(181, 22)
         Me.HELPToolStripMenuItem3.Text = "HELP"
         '
-        'Com6ToolStripMenuItem
-        '
-        Me.Com6ToolStripMenuItem.Name = "Com6ToolStripMenuItem"
-        Me.Com6ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.Com6ToolStripMenuItem.Text = "COM6"
-        '
-        'Com5ToolStripMenuItem
-        '
-        Me.Com5ToolStripMenuItem.Name = "Com5ToolStripMenuItem"
-        Me.Com5ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.Com5ToolStripMenuItem.Text = "COM5"
-        '
         'Lane2laps
         '
         Me.Lane2laps.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Lane2laps.Location = New System.Drawing.Point(169, 19)
+        Me.Lane2laps.Location = New System.Drawing.Point(169, 13)
         Me.Lane2laps.Name = "Lane2laps"
         Me.Lane2laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane2laps.TabIndex = 11
@@ -193,7 +175,7 @@ Partial Class CLTimer
         'Lane1Laps
         '
         Me.Lane1Laps.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Lane1Laps.Location = New System.Drawing.Point(169, 19)
+        Me.Lane1Laps.Location = New System.Drawing.Point(169, 16)
         Me.Lane1Laps.Name = "Lane1Laps"
         Me.Lane1Laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane1Laps.TabIndex = 10
@@ -202,42 +184,15 @@ Partial Class CLTimer
         '
         'SetPortNoToolStripMenuItem
         '
-        Me.SetPortNoToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Com1ToolStripMenuItem, Me.Com2ToolStripMenuItem, Me.Com3ToolStripMenuItem, Me.Com4ToolStripMenuItem, Me.Com5ToolStripMenuItem, Me.Com6ToolStripMenuItem, Me.HELPToolStripMenuItem1})
         Me.SetPortNoToolStripMenuItem.Name = "SetPortNoToolStripMenuItem"
         Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.SetPortNoToolStripMenuItem.Text = "Set Port 1 No."
         '
-        'Com1ToolStripMenuItem
-        '
-        Me.Com1ToolStripMenuItem.Name = "Com1ToolStripMenuItem"
-        Me.Com1ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com1ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.Com1ToolStripMenuItem.Text = "COM1"
-        '
-        'Com2ToolStripMenuItem
-        '
-        Me.Com2ToolStripMenuItem.Name = "Com2ToolStripMenuItem"
-        Me.Com2ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com2ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.Com2ToolStripMenuItem.Text = "COM2"
-        '
-        'Com3ToolStripMenuItem
-        '
-        Me.Com3ToolStripMenuItem.Name = "Com3ToolStripMenuItem"
-        Me.Com3ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com3ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.Com3ToolStripMenuItem.Text = "COM3"
-        '
-        'Com4ToolStripMenuItem
-        '
-        Me.Com4ToolStripMenuItem.Name = "Com4ToolStripMenuItem"
-        Me.Com4ToolStripMenuItem.ShowShortcutKeys = False
-        Me.Com4ToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.Com4ToolStripMenuItem.Text = "COM4"
-        '
         'Lane1
         '
         Me.Lane1.BackColor = System.Drawing.Color.Firebrick
+        Me.Lane1.Controls.Add(Me.Label5)
+        Me.Lane1.Controls.Add(Me.Ln1Speed)
         Me.Lane1.Controls.Add(Me.DQ1)
         Me.Lane1.Controls.Add(Me.Rerun1)
         Me.Lane1.Controls.Add(Me.Label2)
@@ -277,7 +232,7 @@ Partial Class CLTimer
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label2.Location = New System.Drawing.Point(105, 70)
+        Me.Label2.Location = New System.Drawing.Point(104, 52)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(43, 20)
         Me.Label2.TabIndex = 14
@@ -286,7 +241,7 @@ Partial Class CLTimer
         'Ln1Time
         '
         Me.Ln1Time.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln1Time.Location = New System.Drawing.Point(169, 70)
+        Me.Ln1Time.Location = New System.Drawing.Point(169, 52)
         Me.Ln1Time.Name = "Ln1Time"
         Me.Ln1Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln1Time.TabIndex = 12
@@ -308,7 +263,7 @@ Partial Class CLTimer
         Me.Label24.AutoSize = True
         Me.Label24.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label24.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label24.Location = New System.Drawing.Point(104, 26)
+        Me.Label24.Location = New System.Drawing.Point(106, 16)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(44, 20)
         Me.Label24.TabIndex = 24
@@ -340,7 +295,7 @@ Partial Class CLTimer
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label3.Location = New System.Drawing.Point(104, 75)
+        Me.Label3.Location = New System.Drawing.Point(105, 50)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(43, 20)
         Me.Label3.TabIndex = 14
@@ -349,6 +304,8 @@ Partial Class CLTimer
         'GroupBox2
         '
         Me.GroupBox2.BackColor = System.Drawing.Color.Goldenrod
+        Me.GroupBox2.Controls.Add(Me.Label9)
+        Me.GroupBox2.Controls.Add(Me.Ln3Speed)
         Me.GroupBox2.Controls.Add(Me.DQ3)
         Me.GroupBox2.Controls.Add(Me.Rerun3)
         Me.GroupBox2.Controls.Add(Me.Label6)
@@ -388,7 +345,7 @@ Partial Class CLTimer
         Me.Label6.AutoSize = True
         Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label6.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label6.Location = New System.Drawing.Point(103, 74)
+        Me.Label6.Location = New System.Drawing.Point(106, 51)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(43, 20)
         Me.Label6.TabIndex = 14
@@ -399,7 +356,7 @@ Partial Class CLTimer
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label7.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label7.Location = New System.Drawing.Point(105, 26)
+        Me.Label7.Location = New System.Drawing.Point(106, 13)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(44, 20)
         Me.Label7.TabIndex = 13
@@ -408,7 +365,7 @@ Partial Class CLTimer
         'Ln3Time
         '
         Me.Ln3Time.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln3Time.Location = New System.Drawing.Point(169, 67)
+        Me.Ln3Time.Location = New System.Drawing.Point(169, 51)
         Me.Ln3Time.Name = "Ln3Time"
         Me.Ln3Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln3Time.TabIndex = 12
@@ -418,7 +375,7 @@ Partial Class CLTimer
         'Lane3Laps
         '
         Me.Lane3Laps.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Lane3Laps.Location = New System.Drawing.Point(169, 19)
+        Me.Lane3Laps.Location = New System.Drawing.Point(169, 13)
         Me.Lane3Laps.Name = "Lane3Laps"
         Me.Lane3Laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane3Laps.TabIndex = 11
@@ -500,6 +457,8 @@ Partial Class CLTimer
         'GroupBox1
         '
         Me.GroupBox1.BackColor = System.Drawing.Color.OliveDrab
+        Me.GroupBox1.Controls.Add(Me.Label8)
+        Me.GroupBox1.Controls.Add(Me.Ln2Speed)
         Me.GroupBox1.Controls.Add(Me.DQ2)
         Me.GroupBox1.Controls.Add(Me.Rerun2)
         Me.GroupBox1.Controls.Add(Me.Label3)
@@ -925,6 +884,75 @@ Partial Class CLTimer
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "Race Management"
         '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label5.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label5.Location = New System.Drawing.Point(104, 88)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(56, 20)
+        Me.Label5.TabIndex = 26
+        Me.Label5.Text = "Speed"
+        Me.Label5.Visible = False
+        '
+        'Ln1Speed
+        '
+        Me.Ln1Speed.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln1Speed.Location = New System.Drawing.Point(169, 86)
+        Me.Ln1Speed.Name = "Ln1Speed"
+        Me.Ln1Speed.Size = New System.Drawing.Size(106, 31)
+        Me.Ln1Speed.TabIndex = 25
+        Me.Ln1Speed.TabStop = False
+        Me.Ln1Speed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Ln1Speed.Visible = False
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label8.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label8.Location = New System.Drawing.Point(104, 89)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(56, 20)
+        Me.Label8.TabIndex = 28
+        Me.Label8.Text = "Speed"
+        Me.Label8.Visible = False
+        '
+        'Ln2Speed
+        '
+        Me.Ln2Speed.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln2Speed.Location = New System.Drawing.Point(169, 87)
+        Me.Ln2Speed.Name = "Ln2Speed"
+        Me.Ln2Speed.Size = New System.Drawing.Size(106, 31)
+        Me.Ln2Speed.TabIndex = 27
+        Me.Ln2Speed.TabStop = False
+        Me.Ln2Speed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Ln2Speed.Visible = False
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label9.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label9.Location = New System.Drawing.Point(104, 88)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(56, 20)
+        Me.Label9.TabIndex = 28
+        Me.Label9.Text = "Speed"
+        Me.Label9.Visible = False
+        '
+        'Ln3Speed
+        '
+        Me.Ln3Speed.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln3Speed.Location = New System.Drawing.Point(169, 86)
+        Me.Ln3Speed.Name = "Ln3Speed"
+        Me.Ln3Speed.Size = New System.Drawing.Size(106, 31)
+        Me.Ln3Speed.TabIndex = 27
+        Me.Ln3Speed.TabStop = False
+        Me.Ln3Speed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        Me.Ln3Speed.Visible = False
+        '
         'CLTimer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -937,6 +965,7 @@ Partial Class CLTimer
         Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.GroupBox1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.Name = "CLTimer"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -965,18 +994,11 @@ Partial Class CLTimer
     Friend WithEvents ManualStartToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents Ln2Time As System.Windows.Forms.TextBox
     Friend WithEvents CLOCKSTARTToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents HELPToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ManualStartToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents HELPToolStripMenuItem3 As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents Com6ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents Com5ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents Lane2laps As System.Windows.Forms.TextBox
     Friend WithEvents Lane1Laps As System.Windows.Forms.TextBox
     Friend WithEvents SetPortNoToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents Com1ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents Com2ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents Com3ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents Com4ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents Lane1 As System.Windows.Forms.GroupBox
     Friend WithEvents Rerun1 As System.Windows.Forms.Button
     Friend WithEvents Label2 As System.Windows.Forms.Label
@@ -1044,5 +1066,11 @@ Partial Class CLTimer
     Friend WithEvents radHeat As System.Windows.Forms.RadioButton
     Friend WithEvents radFinal As System.Windows.Forms.RadioButton
     Friend WithEvents GroupBox5 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Ln1Speed As System.Windows.Forms.TextBox
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents Ln3Speed As System.Windows.Forms.TextBox
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents Ln2Speed As System.Windows.Forms.TextBox
 
 End Class
