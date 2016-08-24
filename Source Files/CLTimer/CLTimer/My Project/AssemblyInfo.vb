@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("CLTimer")> 
-<Assembly: AssemblyDescription("")> 
+<Assembly: AssemblyDescription("Control Line Racing Timer")> 
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("CLTimer")> 
 <Assembly: AssemblyCopyright("Copyright ©  2016")> 

@@ -52,7 +52,7 @@ Public Class CLTimer
 
     Dim SwTest As Boolean = False
  
-    Dim PortNo As String = "COM3"  '"COM5"
+    Dim PortNo As String = "COM5"
     Dim D_Level As Integer = 6  ' Display Brightness Level
 
     Dim StartCount As Integer = 120 ' This is later re-calculated from config data
