@@ -81,7 +81,15 @@ Public Class Race
             maxSpeedValue = value
         End Set
     End Property
-
+    Private lapsToTimeValue As Integer
+    Public Property LapsToTime() As Integer
+        Get
+            Return lapsToTimeValue
+        End Get
+        Set(ByVal value As Integer)
+            lapsToTimeValue = value
+        End Set
+    End Property
 End Class
 Public Class Races
     Inherits System.Collections.CollectionBase
@@ -134,16 +142,18 @@ Public Class Races
                         headerLine = False
                     Else
                         ' Add code here to use data in fields variable.
-                        Dim myRace As New Race
-                        myRace.Name = fields(0)
-                        myRace.HeatDistance = fields(1)
-                        myRace.FinalDistance = fields(2)
-                        myRace.Type = "Laps"
-                        myRace.WarmUpTime = fields(3)
-                        myRace.CoolDownTime = fields(4)
-                        myRace.MaxHeatTime = fields(5)
-                        myRace.MaxFinalTime = fields(6)
-                        myRace.MaxSpeed = fields(7)
+                        Dim myRace As New Race With {
+                            .Name = fields(0),
+                            .HeatDistance = fields(1),
+                            .FinalDistance = fields(2),
+                            .Type = "Laps",
+                            .WarmUpTime = fields(3),
+                            .CoolDownTime = fields(4),
+                            .MaxHeatTime = fields(5),
+                            .MaxFinalTime = fields(6),
+                            .MaxSpeed = fields(9),
+                            .LapsToTime = fields(10)
+                        }
 
                         If fields(1) = 0 Then
                             myRace.Type = "Mins"
@@ -156,16 +166,18 @@ Public Class Races
 
         Else
             ' Return a default races if file not found
-            Dim myRace As New Race
-            myRace.Name = "F2C"
-            myRace.HeatDistance = 100
-            myRace.FinalDistance = 200
-            myRace.Type = "Laps"
-            myRace.WarmUpTime = 90
-            myRace.CoolDownTime = 30
-            myRace.MaxHeatTime = 6000
-            myRace.MaxFinalTime = 9000
-            myRace.MaxSpeed = 0.0
+            Dim myRace As New Race With {
+                .Name = "F2C",
+                .HeatDistance = 100,
+                .FinalDistance = 200,
+                .Type = "Laps",
+                .WarmUpTime = 90,
+                .CoolDownTime = 30,
+                .MaxHeatTime = 6000,
+                .MaxFinalTime = 9000,
+                .MaxSpeed = 0.0,
+                .LapsToTime = 10
+            }
             Me.Add(myRace)
         End If
 

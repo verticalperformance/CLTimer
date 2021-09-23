@@ -11,9 +11,11 @@
 '15/3/16 Copied from Dev PC as working version
 '----------------------------------------------
 'Keith
-'16/5/16 Made variables for heat and final laps
-'17/6/16 Refactored Rerun clicks into single event
-'26/6/16 Major refactoring to remove and considate duplicate code to do with the DoLane events.
+'16/5/16    Made variables for heat and final laps
+'17/6/16    Refactored Rerun clicks into single event
+'26/6/16    Major refactoring to remove and considate duplicate code to do with the DoLane events.
+'23/9/21    Remove unrequired declarations
+'           Add Live Speed
 
 Imports System.Text
 Imports System
@@ -42,6 +44,7 @@ Public Class CLTimer
     Dim lnState(numberOfLanes - 1) As String
     Dim lnUpdateDisplay(numberOfLanes - 1) As Boolean
     Dim lnDisplay(numberOfLanes - 1) As String
+    Dim lnCurrSpeed(numberOfLanes - 1) As Single
 
     Dim DataIn As String = ""
     Dim NoInHeat As Integer
@@ -81,6 +84,9 @@ Public Class CLTimer
     Public RaceClassesFileName As String = "RaceClasses.csv"
     Public myRaces As New Races 'Race Data model
 
+    Public MaxSpeed As Single = 0.0
+    Public LapsToTime As Integer = 10
+
     Dim SerialPort1 As IO.Ports.SerialPort '= New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
     Public Enum WhatToDisplay
         LapsAndTime
@@ -95,7 +101,6 @@ Public Class CLTimer
             lnDisplay(i) = ""
         Next i
     End Sub
-
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         GetSettings()
@@ -147,7 +152,6 @@ Public Class CLTimer
         bnSetupRace.Focus()
 
     End Sub
-
     Private Sub PopulateRaceListBox()
         Dim myRaceName As String
         For i As Integer = 0 To myRaces.Count - 1
@@ -164,7 +168,6 @@ Public Class CLTimer
         End If
 
     End Sub
-
     Private Sub GetSettings()
 
         StartState = My.Settings.StartState
@@ -172,7 +175,6 @@ Public Class CLTimer
 
 
     End Sub
-
     Private Sub SetSettings()
 
         My.Settings.StartState = StartState
@@ -183,8 +185,6 @@ Public Class CLTimer
         My.Settings.Save()
 
     End Sub
-
-
     Private Sub CLTimer_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         CloseCLTimer()
     End Sub
@@ -240,7 +240,7 @@ Loop1:
                         tbError.Text = ("Data Error")
                         tbError.BackColor = Color.Red
                     End If
-                    y = y + 1
+                    y += 1
                 End While
 
             Case "Racing"
@@ -269,7 +269,7 @@ Loop1:
     Sub TimerDisplayCount(DisplayToUse As String, deltaSeconds As Integer, updateMaster As Boolean)
         ' Increment/decrement the display and master clock
 
-        StartCount = StartCount + deltaSeconds
+        StartCount += deltaSeconds
 
         If updateMaster Then tbClock.Text = FormatSecondsToMinutes(StartCount) 'Update the form master clock if required
 
@@ -298,7 +298,6 @@ Loop1:
                 DataOut = ""
         End Select
     End Sub
-
     Function FormatSecondsToMinutesInDisplayFormat(Seconds As Integer) As String
         Dim tsSeconds = TimeSpan.FromSeconds(Seconds)
         Dim tmpMinutes As String = tsSeconds.ToString("%m")
@@ -419,9 +418,8 @@ Loop1:
                 tbError.Text = ("Data Error")
                 tbError.BackColor = Color.Red
             End If
-            y = y + 1
+            y += 1
         End While
-
 
         If RaceDuration > 0 And elapsedSpan.TotalSeconds >= RaceDuration Then 'stop counting after race duration complete
             RaceTimeExceeded()
@@ -470,7 +468,6 @@ Loop1:
 
 
     End Sub
-
     Private Sub RaceTimeExceeded()
         ShowSecondsOnDisplay("X", RaceDuration)
         'CurrTime = My.Computer.Clock.TickCount.ToString
@@ -484,7 +481,6 @@ Loop1:
         AllDone()
 
     End Sub
-
     Private Sub UpdateAllDisplays()
 
         For i = 0 To numberOfLanes - 1
@@ -502,15 +498,12 @@ Loop1:
         UpDisplay = False
 
     End Sub
-
     Sub DoLane(lane As String)
 
-        Dim laneCurrentLap As Integer = 0
-        Dim laneCurrentTimeInSeconds As Double = 0
-
+        Dim laneCurrentTimeInSeconds As Double
         laneCurrentTimeInSeconds = elapsedSpan.TotalSeconds '(CurrTime - raceStartTime)
 
-        Dim showData As Integer = WhatToDisplay.LapsAndTime
+        Dim showData As Integer
 
         If RaceType = "Laps" Then
             showData = WhatToDisplay.LapsAndTime
@@ -551,7 +544,7 @@ Loop1:
 
     Function UpdateLaneDisplay(lane As String, laneCurrentTimeInSeconds As Double, ByRef laneCurrentLap As Integer, ByRef DisplayLane As String, laneState As TextBox, laneLaps As TextBox, laneTime As TextBox, show As WhatToDisplay, Optional incrementLaps As Boolean = True) As Boolean
 
-        Dim laneCurrentTimeAsString As String = ""
+        Dim laneCurrentTimeAsString As String
         UpdateLaneDisplay = False
 
         If laneState.Text = "Racing" Then
@@ -561,7 +554,7 @@ Loop1:
                 laneState.Text = "Finished"
                 laneState.BackColor = Color.LightSkyBlue
             Else
-                If incrementLaps Then laneCurrentLap = laneCurrentLap + 1 'In racetype laps, when the increment time is calling this don't add to laps
+                If incrementLaps Then laneCurrentLap += 1 'In racetype laps, when the increment time is calling this don't add to laps
             End If
 
             laneCurrentTimeAsString = FormatSecondsToString(laneCurrentTimeInSeconds, "%m\:ss\.ff")
@@ -634,8 +627,6 @@ Loop1:
                 bnSetupRace.Enabled = False
                 bnNextRace.Enabled = False
 
-                'SetupToolStripMenuItem.Enabled = False
-
                 bnStartRace.Focus()
 
                 RunState = "WaitStart"
@@ -653,13 +644,8 @@ Loop1:
                     tbClock.Text = FormatSecondsToMinutes(StartCount)
                     lbReady.Visible = False
                 Else
-                    'ClkLabel.Visible = False
-                    'tbStart.Visible = False
                     tbClock.Text = FormatSecondsToMinutes(0)
-
                 End If
-
-
 
                 MainLoop()
 
@@ -710,7 +696,7 @@ Loop1:
                         If RaceType = "Laps" Then
                             SetDisplayToZeroLapsAndTime()
                         Else
-                             SetDisplayToZeroLapsWithTimer(LaneTimerDisplay)  ' Rat race
+                            SetDisplayToZeroLapsWithTimer(LaneTimerDisplay)  ' Rat race
                         End If
 
                         Done = False
@@ -751,12 +737,10 @@ Loop1:
     End Sub
     Private Sub bnNextRace_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnNextRace.Click
 
-        Dim Str1 As String = ""
-        Dim Str2 As String = ""
-        Dim Str3 As String = ""
-        Dim Str4 As String = ""
-        Dim Str5 As String = ""
-        Dim results As String = ""
+        Dim Str1 As String
+        Dim Str2 As String
+        Dim Str3 As String
+        Dim results As String
 
         Dim RaceFinishTime As String = Format(Now, "f")
 
@@ -789,9 +773,8 @@ Loop1:
         bnSetupRace.Focus()
         DisplayControlsForStartType()
         'bnExit.Enabled = True
- 
-    End Sub
 
+    End Sub
     Private Sub SetFormControlsToInRaceState(Racing As Boolean)
         ' Disable all non race controls when racing = true
         ' Enable when false
@@ -812,7 +795,6 @@ Loop1:
 
 
     End Sub
-
     Private Sub EnableRaceNotCompleteControls(Enable As Boolean)
 
         Rerun1.Enabled = Enable
@@ -826,7 +808,6 @@ Loop1:
         DQ3.Enabled = Enable
 
     End Sub
-
     Sub SetDisplayAsTimer(InitialTime As Integer, DisplayToUse As String)
         'Setup display A,B or C to InitialTimeValue
         DataOut = DisplayToUse & FormatSecondsToMinutesInDisplayFormat(InitialTime)
@@ -866,7 +847,6 @@ Loop1:
             End With
         Next
     End Sub
-
     Sub WaitX(Delay As Double) 'wait time in "Delay" in seconds
 
         Dim ticStart As Long = Now.Ticks
@@ -886,34 +866,13 @@ Loop1:
 
         tmrCommsOK.Start()
 
-        'Dim t_stop As Integer
-        'Dim tim As Integer
-        'tmrCommsOK.Stop()
-        'CurrTime = My.Computer.Clock.TickCount.ToString
-        'CurrTime = CurrTime / 1000
-        't_stop = CurrTime + Delay
-
-        'RcvData.BackColor = Color.LightGreen 'don't monitor data in for now
-
-        'Do While t_stop > CurrTime       'wait here
-        '    My.Application.DoEvents()
-        '    tim = t_stop - CurrTime
-        '    tim = Format(tim, "##00")
-        '    'tbClock.Text = tim
-        '    CurrTime = My.Computer.Clock.TickCount.ToString
-        '    CurrTime = CurrTime / 1000
-        'Loop
-        'tmrCommsOK.Start()
     End Sub
     Sub WaitY() 'wait 0.3 secs
-
-        'Dim t_stop As Integer
-        'Dim tim As Integer
 
         Dim ticStart As Long = Now.Ticks
         Dim waitTime As Double = 0.3
 
-        Dim elapsedSecondsTicks As Long = 0
+        Dim elapsedSecondsTicks As Long
         Dim elapsedSecondsSpan As TimeSpan
 
         Do
@@ -921,28 +880,13 @@ Loop1:
             elapsedSecondsSpan = New TimeSpan(elapsedSecondsTicks)
         Loop While elapsedSecondsSpan.TotalSeconds <= waitTime
 
-        '        CurrTime = My.Computer.Clock.TickCount.ToString
-        '        CurrTime = CurrTime / 100
-        '       t_stop = CurrTime + 3
-
-        '        Do While t_stop > CurrTime       'wait here
-        '  My.Application.DoEvents()   'allow "other stuff"
-        'tim = t_stop - CurrTime
-        'tbClock.Text = tim
-        '       CurrTime = My.Computer.Clock.TickCount.ToString
-        '      CurrTime = CurrTime / 100
-        '      Loop
-
-
     End Sub
-
     Sub ReadIn1() '(ByVal datain As String)
         DataIn = ""
         With SerialPort1
             If .IsOpen Then DataIn = .ReadExisting()
         End With
     End Sub
-
     Private Sub tmrCommsOK_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tmrCommsOK.Tick
         '3 secs time, used for monitoring data receive from timers. Gets reset while racing if other data received.
         ' While idle, handle "X" in from timers and send "X" out to displays for keep alive
@@ -963,7 +907,7 @@ Loop1:
                 If InStr("X", char1) Then
                     DataOk = True
                 End If
-                y = y + 1
+                y += 1
             End While
         End If
 
@@ -998,7 +942,6 @@ Loop1:
         tmrConsXmitDelay.Stop()
 
     End Sub
-
     Sub SetNoInHeat()
 
         NoInHeat = 3            'was used when reading names in, for now just set to 3
@@ -1045,7 +988,6 @@ Loop1:
         StateLn3.BackColor = Color.White
 
     End Sub
-
     Private Sub SetLaneLapTextToZero()
         Lane1Laps.Text = "0"
         Lane2laps.Text = "0"
@@ -1055,6 +997,11 @@ Loop1:
         Ln1Time.Text = "0:00.00"
         Ln2Time.Text = "0:00.00"
         Ln3Time.Text = "0:00.00"
+    End Sub
+    Private Sub SetLaneSpeedTextToZero()
+        Ln1Speed.Text = "00.0"
+        Ln2Speed.Text = "00.0"
+        Ln3Speed.Text = "00.0"
     End Sub
 
     Private Sub SwitchTestTimerTick(sender As System.Object, e As System.EventArgs) Handles tmrRedSw.Tick, tmrGrnSw.Tick, tmrAmbSw.Tick, tmrStarterSw.Tick
@@ -1074,7 +1021,6 @@ Loop1:
         sender.Stop() ' Stop the timer
 
     End Sub
-
     Private Sub TestDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TestDisplay.Click
         With SerialPort1
             If .IsOpen Then
@@ -1125,7 +1071,7 @@ Loop1:
     Private Sub AdjustDisplayBrightness_Click(sender As System.Object, e As System.EventArgs) Handles IncDisplay.Click, DecDisplay.Click
         If sender Is IncDisplay Then
             If D_Level < 6 Then
-                D_Level = D_Level + 1
+                D_Level += 1
                 DataOut = "I"           'Increase display intensity
             Else
                 DataOut = ""
@@ -1133,7 +1079,7 @@ Loop1:
 
         Else
             If D_Level > 1 Then
-                D_Level = D_Level - 1
+                D_Level -= 1
                 DataOut = "D"           'Decrease display intensity
             Else
                 DataOut = ""
@@ -1255,7 +1201,7 @@ Loop1:
                                         tmrStarterSw.Start()
                                 End Select
                             End If
-                            y = y + 1
+                            y += 1
                         End While
                     Loop
 
@@ -1291,7 +1237,6 @@ Loop1:
         End With
     End Sub
 
-
     Private Sub CreateComPortStripMenu()
 
         SetPortNoToolStripMenuItem.DropDownItems.Clear()
@@ -1315,7 +1260,6 @@ Loop1:
 
 
     End Sub
-
     Private Sub SelectComPortStripMenuByName(Name As String)
         For Each tsMenuItem As ToolStripMenuItem In SetPortNoToolStripMenuItem.DropDownItems
             If tsMenuItem.Name = Name Then
@@ -1325,7 +1269,6 @@ Loop1:
             End If
         Next
     End Sub
-
     Private Sub ComToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         UnCheckComportMenuItems()
@@ -1343,7 +1286,7 @@ Loop1:
                 End If
             End With
 
-            Dim NewSerialPort As IO.Ports.SerialPort = New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
+            Dim NewSerialPort As New IO.Ports.SerialPort(PortNo, 1200, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
             SerialPort1 = NewSerialPort
             On Error GoTo err1
             With SerialPort1
@@ -1358,27 +1301,27 @@ err1:
         MsgBox("   " & PortNo & " Not Found   ")
 endsub:
     End Sub
-
     Private Sub UnCheckComportMenuItems()
         For Each ToolStripMenuItem In SetPortNoToolStripMenuItem.DropDownItems
             ToolStripMenuItem.Checked = False
         Next
     End Sub
-
     Private Sub HELPToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         MsgBox("Port number of the serial port, used for communicating with the Lap Counter switches and to send UHF data to the clock. The default is 5")
     End Sub
-
     Private Sub CLOCKSTARTToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CLOCKSTARTToolStripMenuItem.Click
         'Start using computer and display    
         StartState = "Auto"
         DisplayControlsForStartType()
     End Sub
-
     Private Sub ManualStartToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ManualStartToolStripMenuItem1.Click
         'start using flag fall
         StartState = "Manual"
         DisplayControlsForStartType()
+    End Sub
+    Private Sub HELPToolStripMenuItem3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HELPToolStripMenuItem3.Click
+        'clock start or manual start? 
+        MsgBox("Select Manual if you want the starter to start the race with the switch instead of with the display countdown")
     End Sub
 
     Private Sub DisplayControlsForStartType()
@@ -1404,11 +1347,6 @@ endsub:
                 tbClock.Text = FormatSecondsToMinutes(StartCount)
         End Select
 
-    End Sub
-
-    Private Sub HELPToolStripMenuItem3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HELPToolStripMenuItem3.Click
-        'clock start or manual start? 
-        MsgBox("Select Manual if you want the starter to start the race with the switch instead of with the display countdown")
     End Sub
 
     Private Sub DNF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DNF1.Click, DNF2.Click, DNF3.Click
@@ -1505,6 +1443,8 @@ endsub:
         FinalLaps = myRaces.Item(sender.SelectedIndex).FinalDistance
         MaxHeatTime = myRaces.Item(sender.SelectedIndex).MaxHeatTime
         MaxFinalTime = myRaces.Item(sender.SelectedIndex).MaxFinalTime
+        MaxSpeed = myRaces.Item(sender.SelectedIndex).MaxSpeed
+        LapsToTime = myRaces.Item(sender.SelectedIndex).LapsToTime
 
         If StartState = "Manual" Then
             StartCount = 0
@@ -1526,7 +1466,7 @@ endsub:
             RaceDuration = MaxFinalTime
         End If
         SetupRaceLengthForRaceType()
-
+        SetupLapsToTime(LapsToTime)
     End Sub
     Private Sub SetupRaceLengthForRaceType()
         If RaceType = "Laps" Then
@@ -1535,11 +1475,32 @@ endsub:
             RaceDistance = 0
             RaceLength.Text = FormatSecondsToMinutes(RaceDuration)
         End If
+
+        SpeedLimit.Text = Format(MaxSpeed, "#0.0")
+        SpeedLimitText.Text = FormatLapsToTime(LapsToTime)
+
+        If MaxSpeed > 0 Then
+
+            SpeedLimit.Visible = True
+            SpeedLimitText.Visible = True
+        Else
+            SpeedLimit.Visible = False
+            SpeedLimitText.Visible = False
+        End If
+
+
     End Sub
+    Private Sub SetupLapsToTime(LapsToTime As Integer)
+        Ln1SpeedUnit.Text = FormatLapsToTime(LapsToTime)
+        Ln2SpeedUnit.Text = FormatLapsToTime(LapsToTime)
+        Ln3SpeedUnit.Text = FormatLapsToTime(LapsToTime)
+    End Sub
+    Private Function FormatLapsToTime(LapsToTime As Integer) As String
+        FormatLapsToTime = "s/" & Format(LapsToTime, "0")
+    End Function
     Private Sub bnClearDisplayBoardOnly_Click(sender As System.Object, e As System.EventArgs) Handles ClearDisplayBoardOnly.Click
         Clear_Display()
     End Sub
-
 
 End Class
 

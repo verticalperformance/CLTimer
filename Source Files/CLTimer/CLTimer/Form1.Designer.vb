@@ -106,6 +106,11 @@ Partial Class CLTimer
         Me.radHeat = New System.Windows.Forms.RadioButton()
         Me.radFinal = New System.Windows.Forms.RadioButton()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.Ln1SpeedUnit = New System.Windows.Forms.Label()
+        Me.Ln2SpeedUnit = New System.Windows.Forms.Label()
+        Me.Ln3SpeedUnit = New System.Windows.Forms.Label()
+        Me.SpeedLimitText = New System.Windows.Forms.Label()
+        Me.SpeedLimit = New System.Windows.Forms.TextBox()
         Me.Lane1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -121,7 +126,7 @@ Partial Class CLTimer
         Me.Label4.AutoSize = True
         Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label4.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label4.Location = New System.Drawing.Point(104, 13)
+        Me.Label4.Location = New System.Drawing.Point(98, 12)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(44, 20)
         Me.Label4.TabIndex = 13
@@ -136,7 +141,7 @@ Partial Class CLTimer
         'Ln2Time
         '
         Me.Ln2Time.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln2Time.Location = New System.Drawing.Point(169, 50)
+        Me.Ln2Time.Location = New System.Drawing.Point(163, 49)
         Me.Ln2Time.Name = "Ln2Time"
         Me.Ln2Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln2Time.TabIndex = 12
@@ -165,7 +170,7 @@ Partial Class CLTimer
         'Lane2laps
         '
         Me.Lane2laps.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Lane2laps.Location = New System.Drawing.Point(169, 13)
+        Me.Lane2laps.Location = New System.Drawing.Point(163, 12)
         Me.Lane2laps.Name = "Lane2laps"
         Me.Lane2laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane2laps.TabIndex = 11
@@ -175,7 +180,7 @@ Partial Class CLTimer
         'Lane1Laps
         '
         Me.Lane1Laps.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Lane1Laps.Location = New System.Drawing.Point(169, 16)
+        Me.Lane1Laps.Location = New System.Drawing.Point(164, 16)
         Me.Lane1Laps.Name = "Lane1Laps"
         Me.Lane1Laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane1Laps.TabIndex = 10
@@ -191,6 +196,7 @@ Partial Class CLTimer
         'Lane1
         '
         Me.Lane1.BackColor = System.Drawing.Color.Firebrick
+        Me.Lane1.Controls.Add(Me.Ln1SpeedUnit)
         Me.Lane1.Controls.Add(Me.Label5)
         Me.Lane1.Controls.Add(Me.Ln1Speed)
         Me.Lane1.Controls.Add(Me.DQ1)
@@ -212,23 +218,22 @@ Partial Class CLTimer
         Me.Label5.AutoSize = True
         Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label5.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label5.Location = New System.Drawing.Point(104, 88)
+        Me.Label5.Location = New System.Drawing.Point(99, 88)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(56, 20)
         Me.Label5.TabIndex = 26
         Me.Label5.Text = "Speed"
-        Me.Label5.Visible = False
         '
         'Ln1Speed
         '
         Me.Ln1Speed.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln1Speed.Location = New System.Drawing.Point(169, 86)
+        Me.Ln1Speed.Location = New System.Drawing.Point(164, 86)
         Me.Ln1Speed.Name = "Ln1Speed"
-        Me.Ln1Speed.Size = New System.Drawing.Size(106, 31)
+        Me.Ln1Speed.Size = New System.Drawing.Size(60, 31)
         Me.Ln1Speed.TabIndex = 25
         Me.Ln1Speed.TabStop = False
+        Me.Ln1Speed.Text = "--- "
         Me.Ln1Speed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Ln1Speed.Visible = False
         '
         'DQ1
         '
@@ -255,7 +260,7 @@ Partial Class CLTimer
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label2.Location = New System.Drawing.Point(104, 52)
+        Me.Label2.Location = New System.Drawing.Point(99, 52)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(43, 20)
         Me.Label2.TabIndex = 14
@@ -264,7 +269,7 @@ Partial Class CLTimer
         'Ln1Time
         '
         Me.Ln1Time.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln1Time.Location = New System.Drawing.Point(169, 52)
+        Me.Ln1Time.Location = New System.Drawing.Point(164, 52)
         Me.Ln1Time.Name = "Ln1Time"
         Me.Ln1Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln1Time.TabIndex = 12
@@ -286,7 +291,7 @@ Partial Class CLTimer
         Me.Label24.AutoSize = True
         Me.Label24.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label24.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label24.Location = New System.Drawing.Point(106, 16)
+        Me.Label24.Location = New System.Drawing.Point(101, 16)
         Me.Label24.Name = "Label24"
         Me.Label24.Size = New System.Drawing.Size(44, 20)
         Me.Label24.TabIndex = 24
@@ -318,7 +323,7 @@ Partial Class CLTimer
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label3.Location = New System.Drawing.Point(105, 50)
+        Me.Label3.Location = New System.Drawing.Point(99, 49)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(43, 20)
         Me.Label3.TabIndex = 14
@@ -327,6 +332,7 @@ Partial Class CLTimer
         'GroupBox2
         '
         Me.GroupBox2.BackColor = System.Drawing.Color.Goldenrod
+        Me.GroupBox2.Controls.Add(Me.Ln3SpeedUnit)
         Me.GroupBox2.Controls.Add(Me.Label9)
         Me.GroupBox2.Controls.Add(Me.Ln3Speed)
         Me.GroupBox2.Controls.Add(Me.DQ3)
@@ -348,23 +354,22 @@ Partial Class CLTimer
         Me.Label9.AutoSize = True
         Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label9.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label9.Location = New System.Drawing.Point(104, 88)
+        Me.Label9.Location = New System.Drawing.Point(98, 88)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(56, 20)
         Me.Label9.TabIndex = 28
         Me.Label9.Text = "Speed"
-        Me.Label9.Visible = False
         '
         'Ln3Speed
         '
         Me.Ln3Speed.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln3Speed.Location = New System.Drawing.Point(169, 86)
+        Me.Ln3Speed.Location = New System.Drawing.Point(163, 86)
         Me.Ln3Speed.Name = "Ln3Speed"
-        Me.Ln3Speed.Size = New System.Drawing.Size(106, 31)
+        Me.Ln3Speed.Size = New System.Drawing.Size(60, 31)
         Me.Ln3Speed.TabIndex = 27
         Me.Ln3Speed.TabStop = False
+        Me.Ln3Speed.Text = "--- "
         Me.Ln3Speed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Ln3Speed.Visible = False
         '
         'DQ3
         '
@@ -391,7 +396,7 @@ Partial Class CLTimer
         Me.Label6.AutoSize = True
         Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label6.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label6.Location = New System.Drawing.Point(106, 51)
+        Me.Label6.Location = New System.Drawing.Point(100, 51)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(43, 20)
         Me.Label6.TabIndex = 14
@@ -402,7 +407,7 @@ Partial Class CLTimer
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label7.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label7.Location = New System.Drawing.Point(106, 13)
+        Me.Label7.Location = New System.Drawing.Point(100, 13)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(44, 20)
         Me.Label7.TabIndex = 13
@@ -411,7 +416,7 @@ Partial Class CLTimer
         'Ln3Time
         '
         Me.Ln3Time.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln3Time.Location = New System.Drawing.Point(169, 51)
+        Me.Ln3Time.Location = New System.Drawing.Point(163, 51)
         Me.Ln3Time.Name = "Ln3Time"
         Me.Ln3Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln3Time.TabIndex = 12
@@ -421,7 +426,7 @@ Partial Class CLTimer
         'Lane3Laps
         '
         Me.Lane3Laps.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Lane3Laps.Location = New System.Drawing.Point(169, 13)
+        Me.Lane3Laps.Location = New System.Drawing.Point(163, 13)
         Me.Lane3Laps.Name = "Lane3Laps"
         Me.Lane3Laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane3Laps.TabIndex = 11
@@ -503,6 +508,7 @@ Partial Class CLTimer
         'GroupBox1
         '
         Me.GroupBox1.BackColor = System.Drawing.Color.OliveDrab
+        Me.GroupBox1.Controls.Add(Me.Ln2SpeedUnit)
         Me.GroupBox1.Controls.Add(Me.Label8)
         Me.GroupBox1.Controls.Add(Me.Ln2Speed)
         Me.GroupBox1.Controls.Add(Me.DQ2)
@@ -524,23 +530,22 @@ Partial Class CLTimer
         Me.Label8.AutoSize = True
         Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label8.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label8.Location = New System.Drawing.Point(104, 89)
+        Me.Label8.Location = New System.Drawing.Point(98, 88)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(56, 20)
         Me.Label8.TabIndex = 28
         Me.Label8.Text = "Speed"
-        Me.Label8.Visible = False
         '
         'Ln2Speed
         '
         Me.Ln2Speed.Font = New System.Drawing.Font("Microsoft Sans Serif", 15.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln2Speed.Location = New System.Drawing.Point(169, 87)
+        Me.Ln2Speed.Location = New System.Drawing.Point(163, 86)
         Me.Ln2Speed.Name = "Ln2Speed"
-        Me.Ln2Speed.Size = New System.Drawing.Size(106, 31)
+        Me.Ln2Speed.Size = New System.Drawing.Size(61, 31)
         Me.Ln2Speed.TabIndex = 27
         Me.Ln2Speed.TabStop = False
+        Me.Ln2Speed.Text = "--- "
         Me.Ln2Speed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        Me.Ln2Speed.Visible = False
         '
         'DQ2
         '
@@ -800,7 +805,7 @@ Partial Class CLTimer
         '
         'tbClock
         '
-        Me.tbClock.Location = New System.Drawing.Point(217, 77)
+        Me.tbClock.Location = New System.Drawing.Point(217, 151)
         Me.tbClock.Name = "tbClock"
         Me.tbClock.Size = New System.Drawing.Size(55, 20)
         Me.tbClock.TabIndex = 118
@@ -861,7 +866,7 @@ Partial Class CLTimer
         Me.ClkLabel.AutoSize = True
         Me.ClkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold)
         Me.ClkLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.ClkLabel.Location = New System.Drawing.Point(137, 80)
+        Me.ClkLabel.Location = New System.Drawing.Point(137, 154)
         Me.ClkLabel.Name = "ClkLabel"
         Me.ClkLabel.Size = New System.Drawing.Size(70, 13)
         Me.ClkLabel.TabIndex = 121
@@ -934,6 +939,8 @@ Partial Class CLTimer
         '
         'GroupBox5
         '
+        Me.GroupBox5.Controls.Add(Me.SpeedLimitText)
+        Me.GroupBox5.Controls.Add(Me.SpeedLimit)
         Me.GroupBox5.Controls.Add(Me.radFinal)
         Me.GroupBox5.Controls.Add(Me.radHeat)
         Me.GroupBox5.Controls.Add(Me.ClassName)
@@ -952,6 +959,63 @@ Partial Class CLTimer
         Me.GroupBox5.TabIndex = 140
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "Race Management"
+        '
+        'Ln1SpeedUnit
+        '
+        Me.Ln1SpeedUnit.AutoSize = True
+        Me.Ln1SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln1SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Ln1SpeedUnit.Location = New System.Drawing.Point(231, 88)
+        Me.Ln1SpeedUnit.Name = "Ln1SpeedUnit"
+        Me.Ln1SpeedUnit.Size = New System.Drawing.Size(39, 20)
+        Me.Ln1SpeedUnit.TabIndex = 27
+        Me.Ln1SpeedUnit.Text = "s/10"
+        '
+        'Ln2SpeedUnit
+        '
+        Me.Ln2SpeedUnit.AutoSize = True
+        Me.Ln2SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln2SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Ln2SpeedUnit.Location = New System.Drawing.Point(230, 88)
+        Me.Ln2SpeedUnit.Name = "Ln2SpeedUnit"
+        Me.Ln2SpeedUnit.Size = New System.Drawing.Size(39, 20)
+        Me.Ln2SpeedUnit.TabIndex = 29
+        Me.Ln2SpeedUnit.Text = "s/10"
+        '
+        'Ln3SpeedUnit
+        '
+        Me.Ln3SpeedUnit.AutoSize = True
+        Me.Ln3SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln3SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Ln3SpeedUnit.Location = New System.Drawing.Point(230, 88)
+        Me.Ln3SpeedUnit.Name = "Ln3SpeedUnit"
+        Me.Ln3SpeedUnit.Size = New System.Drawing.Size(39, 20)
+        Me.Ln3SpeedUnit.TabIndex = 29
+        Me.Ln3SpeedUnit.Text = "s/10"
+        '
+        'SpeedLimitText
+        '
+        Me.SpeedLimitText.AutoSize = True
+        Me.SpeedLimitText.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.SpeedLimitText.Location = New System.Drawing.Point(231, 80)
+        Me.SpeedLimitText.Name = "SpeedLimitText"
+        Me.SpeedLimitText.Size = New System.Drawing.Size(39, 20)
+        Me.SpeedLimitText.TabIndex = 132
+        Me.SpeedLimitText.Text = "s/10"
+        Me.SpeedLimitText.Visible = False
+        '
+        'SpeedLimit
+        '
+        Me.SpeedLimit.BackColor = System.Drawing.Color.LightGray
+        Me.SpeedLimit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.SpeedLimit.Location = New System.Drawing.Point(161, 77)
+        Me.SpeedLimit.Name = "SpeedLimit"
+        Me.SpeedLimit.Size = New System.Drawing.Size(67, 26)
+        Me.SpeedLimit.TabIndex = 131
+        Me.SpeedLimit.TabStop = False
+        Me.SpeedLimit.Text = "00.0"
+        Me.SpeedLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.SpeedLimit.Visible = False
         '
         'CLTimer
         '
@@ -1072,5 +1136,9 @@ Partial Class CLTimer
     Friend WithEvents Ln3Speed As System.Windows.Forms.TextBox
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents Ln2Speed As System.Windows.Forms.TextBox
-
+    Friend WithEvents Ln1SpeedUnit As Label
+    Friend WithEvents Ln3SpeedUnit As Label
+    Friend WithEvents Ln2SpeedUnit As Label
+    Friend WithEvents SpeedLimitText As Label
+    Friend WithEvents SpeedLimit As TextBox
 End Class
