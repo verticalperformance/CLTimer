@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="CLTimer.Lap">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAgABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>lapDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.RaceClass">
+    <Position X="2.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAABAAAAjAAAAARQIMAAQBoABAIIAgAQAAAAAAAAA=</HashCode>
+      <FileName>raceClassDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.RaceClasses">
+    <Position X="0.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAABAAEAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>raceClassDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.Laps">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAACAAAAAAAAAABAAEAAAAAAAAAQAAAABAAAA=</HashCode>
+      <FileName>lapDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.Races">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAABAAEAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>raceDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.RaceLapResults">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAABAAEAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>raceDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.Race">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAQAAAoAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>raceDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

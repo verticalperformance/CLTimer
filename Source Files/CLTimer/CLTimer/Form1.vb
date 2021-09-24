@@ -82,7 +82,7 @@ Public Class CLTimer
     Public RaceType As String = "Laps"
 
     Public RaceClassesFileName As String = "RaceClasses.csv"
-    Public myRaces As New Races 'Race Data model
+    Public myRaceClasses As New RaceClasses 'Race Data model
 
     Public MaxSpeed As Single = 0.0
     Public LapsToTime As Integer = 10
@@ -144,7 +144,7 @@ Public Class CLTimer
 
         RaceClassesFileName = AppPath & "\" & RaceClassesFileName  'Add the excecutable path
 
-        myRaces.ReadRaceClassesFromFile(RaceClassesFileName) 'Read the race class file into the data model
+        myRaceClasses.ReadRaceClassesFromFile(RaceClassesFileName) 'Read the race class file into the data model
 
         PopulateRaceListBox() ' Display Race classes
         DisplayControlsForStartType() ' Setup buttons based on manual or auto start
@@ -154,14 +154,14 @@ Public Class CLTimer
     End Sub
     Private Sub PopulateRaceListBox()
         Dim myRaceName As String
-        For i As Integer = 0 To myRaces.Count - 1
-            Dim myRace As New Race
-            myRace = myRaces.Item(i)
+        For i As Integer = 0 To myRaceClasses.Count - 1
+            Dim myRace As New RaceClass
+            myRace = myRaceClasses.Item(i)
             myRaceName = myRace.Name
             ClassName.Items.Add(myRaceName)
         Next
 
-        If My.Settings.LastEvent < myRaces.Count Then
+        If My.Settings.LastEvent < myRaceClasses.Count Then
             ClassName.SelectedIndex = My.Settings.LastEvent ' Show the last event run
         Else
             ClassName.SelectedIndex = 0 'Show item 1, and hence populate race data model
@@ -190,6 +190,7 @@ Public Class CLTimer
     End Sub
     Private Sub bnExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bnExit.Click
         MyBase.Close() ' Tell the form to close
+        End
     End Sub
     Private Sub CloseCLTimer()
         ' Shutdown events
@@ -248,6 +249,7 @@ Loop1:
                     tmrConsXmitDelay.Stop()
                     RunState = "Finished"
                     bnStartRace.Enabled = False
+                    lbReady.Visible = True
                     bnNextRace.Enabled = True
                     SetupToolStripMenuItem.Enabled = True
                     radHeat.Enabled = True
@@ -260,6 +262,9 @@ Loop1:
 
             Case "Finished"
                 'wait for save clicked
+                Debug.Print("Finished")
+
+                If InStr(lbReady.Text, "Stop") = 0 Then lbReady.Visible = False
 
         End Select
         GoTo Loop1
@@ -364,10 +369,13 @@ Loop1:
         StateLn3.Text = lnState(2)
         StateLn3.BackColor = Color.LightGreen
         tbClock.BackColor = Color.White
-        bnStartRace.BackColor = Color.Silver
 
 
-        bnStartRace.Enabled = False
+
+        bnStartRace.BackColor = Color.Magenta
+        bnStartRace.Enabled = True
+
+
         bnNextRace.Enabled = False
         radHeat.Enabled = False
         radFinal.Enabled = False
@@ -377,10 +385,10 @@ Loop1:
 
 
         If StartState = "Auto" Then
-            bnStartRace.Text = "Racing"
+            bnStartRace.Text = "Stop Race"
 
         Else
-            bnStartRace.Text = "Racing"      'StartState = "Manual"
+            bnStartRace.Text = "Stop Race"      'StartState = "Manual"
             lbReady.Visible = False
         End If
 
@@ -413,6 +421,17 @@ Loop1:
                         DoLane(char1)
                         tmrCommsOK.Stop()                 'any valid char resets timeout
                         tmrCommsOK.Start()
+
+                    Case "D"
+                        ' Do something if starter button pressed
+                        lbReady.Text = "Stopped by Starter"
+                        lbReady.Visible = True
+                        lbReady.BackColor = Color.Magenta
+
+                        EndRunningRace()
+                        tmrCommsOK.Stop()                 'any valid char resets timeout
+                        tmrCommsOK.Start()
+                        UpDisplay = True
                 End Select
             Else
                 tbError.Text = ("Data Error")
@@ -577,6 +596,66 @@ Loop1:
 
     End Function
 
+    Sub EndRunningRace()
+        ' Stop a race that is running
+
+        Dim lane As String
+
+        Dim lnStatus As Windows.Forms.TextBox = Nothing
+        Dim lnLaps As Windows.Forms.TextBox = Nothing
+        Dim lnTime As Windows.Forms.TextBox = Nothing
+
+        Dim showData As Integer
+
+        If RaceType = "Laps" Then
+            showData = WhatToDisplay.LapsAndTime
+        Else
+            showData = WhatToDisplay.Laps
+        End If
+
+
+        For lnNumber = 0 To numberOfLanes - 1
+
+            Select Case lnNumber
+                Case 0
+                    lnStatus = StateLn1
+                    lnLaps = Lane1Laps
+                    lnTime = Ln1Time
+                Case 1
+                    lnStatus = StateLn2
+                    lnLaps = Lane2laps
+                    lnTime = Ln2Time
+                Case 2
+                    lnStatus = StateLn3
+                    lnLaps = Lane3Laps
+                    lnTime = Ln3Time
+            End Select
+
+            lane = Chr(lnNumber)
+
+            Dim laneCurrentTimeInSeconds As Double
+            laneCurrentTimeInSeconds = elapsedSpan.TotalSeconds '(CurrTime - raceStartTime)
+
+            If lnStatus.Text <> "Finished" Then
+                lnStatus.Text = "Stopped"
+                lnStatus.BackColor = Color.Magenta
+            End If
+
+            lnUpdateDisplay(lnNumber) = UpdateLaneDisplay(lane, laneCurrentTimeInSeconds, lnCurrLap(lnNumber), lnDisplay(lnNumber), lnStatus, lnLaps, lnTime, showData, True)
+            lnState(lnNumber) = lnStatus.Text
+
+        Next
+
+
+        AllDone()               'keep all times 
+
+        lbReady.Text = "Stopped by Starter"
+        lbReady.Visible = True
+
+    End Sub
+
+
+
     Sub AllDone() ' check if all have finished
         Select Case NoInHeat
             Case 1
@@ -596,6 +675,10 @@ Loop1:
         If Done Then
             'Need to make sure clock gets updated before stopping
             UpdateAllDisplays()
+            bnStartRace.Text = "Finished"
+            bnStartRace.BackColor = Color.Silver
+            Dim blTemp As Boolean = lbReady.Visible
+
             bnNextRace.Focus()
         End If
 
@@ -632,7 +715,7 @@ Loop1:
                 RunState = "WaitStart"
 
                 ' Reset the warmup/cooldown times
-                StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
+                StartCount = myRaceClasses.Item(ClassName.SelectedIndex).WarmUpTime + myRaceClasses.Item(ClassName.SelectedIndex).CoolDownTime
 
                 LaneTimerDisplay = "A"
 
@@ -645,6 +728,10 @@ Loop1:
                     lbReady.Visible = False
                 Else
                     tbClock.Text = FormatSecondsToMinutes(0)
+                    lbReady.Text = "Ready For Starter"
+                    lbReady.Visible = False
+                    lbReady.BackColor = Color.Silver
+
                 End If
 
                 MainLoop()
@@ -663,7 +750,7 @@ Loop1:
         End If
 
         ' Reset the warmup/cooldown times
-        StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
+        StartCount = myRaceClasses.Item(ClassName.SelectedIndex).WarmUpTime + myRaceClasses.Item(ClassName.SelectedIndex).CoolDownTime
 
         If DataOk Then
             Select Case RunState
@@ -700,8 +787,10 @@ Loop1:
                         End If
 
                         Done = False
+                        lbReady.Text = "Ready For Starter"
                         lbReady.Visible = True
                         lbReady.BackColor = Color.LightGreen
+
                     End If
 
                 Case "AutoStart"        'Cancel auto start count down
@@ -730,6 +819,15 @@ Loop1:
                     bnStartRace.Text = "Prepare for Start"
                     lbReady.Visible = False
                     RunState = "WaitStart"
+
+                Case "Racing" ' Reset at the console
+
+                    SetFormControlsToInRaceState(False)
+                    EndRunningRace()
+                    lbReady.Text = "Stopped by Operator"
+                    lbReady.BackColor = Color.Magenta
+
+
             End Select
         Else
             MessageBox.Show("Not Receiving Data from Timers")
@@ -767,12 +865,11 @@ Loop1:
 
         SetFormControlsToInRaceState(False)
         EnableRaceNotCompleteControls(False)
-
+        bnStartRace.BackColor = Color.Silver
         bnNextRace.Enabled = False
         bnSetupRace.Enabled = True
         bnSetupRace.Focus()
         DisplayControlsForStartType()
-        'bnExit.Enabled = True
 
     End Sub
     Private Sub SetFormControlsToInRaceState(Racing As Boolean)
@@ -1328,7 +1425,7 @@ endsub:
         ' Populate the buttons and labels for a particular start type
         Select Case StartState
             Case "Auto"
-                StartCount = myRaces.Item(ClassName.SelectedIndex).WarmUpTime + myRaces.Item(ClassName.SelectedIndex).CoolDownTime
+                StartCount = myRaceClasses.Item(ClassName.SelectedIndex).WarmUpTime + myRaceClasses.Item(ClassName.SelectedIndex).CoolDownTime
                 CLOCKSTARTToolStripMenuItem.Checked = True
                 ManualStartToolStripMenuItem1.Checked = False
                 bnStartRace.Text = ("Start Countdown")
@@ -1439,22 +1536,22 @@ endsub:
     End Sub
     Private Sub ClassName_SelectedIndexChanged(sender As System.Object, e As System.EventArgs) Handles ClassName.SelectedIndexChanged
 
-        HeatLaps = myRaces.Item(sender.SelectedIndex).HeatDistance
-        FinalLaps = myRaces.Item(sender.SelectedIndex).FinalDistance
-        MaxHeatTime = myRaces.Item(sender.SelectedIndex).MaxHeatTime
-        MaxFinalTime = myRaces.Item(sender.SelectedIndex).MaxFinalTime
-        MaxSpeed = myRaces.Item(sender.SelectedIndex).MaxSpeed
-        LapsToTime = myRaces.Item(sender.SelectedIndex).LapsToTime
+        HeatLaps = myRaceClasses.Item(sender.SelectedIndex).HeatDistance
+        FinalLaps = myRaceClasses.Item(sender.SelectedIndex).FinalDistance
+        MaxHeatTime = myRaceClasses.Item(sender.SelectedIndex).MaxHeatTime
+        MaxFinalTime = myRaceClasses.Item(sender.SelectedIndex).MaxFinalTime
+        MaxSpeed = myRaceClasses.Item(sender.SelectedIndex).MaxSpeed
+        LapsToTime = myRaceClasses.Item(sender.SelectedIndex).LapsToTime
 
         If StartState = "Manual" Then
             StartCount = 0
         Else
-            StartCount = myRaces.Item(sender.SelectedIndex).WarmUpTime + myRaces.Item(sender.SelectedIndex).CoolDownTime
+            StartCount = myRaceClasses.Item(sender.SelectedIndex).WarmUpTime + myRaceClasses.Item(sender.SelectedIndex).CoolDownTime
         End If
 
         tbClock.Text = FormatSecondsToMinutes(StartCount)
 
-        RaceType = myRaces.Item(sender.SelectedIndex).Type
+        RaceType = myRaceClasses.Item(sender.SelectedIndex).Type
 
         lblTimeOrDistance.Text = RaceType
 
@@ -1502,6 +1599,9 @@ endsub:
         Clear_Display()
     End Sub
 
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+        frmAboutBox.ShowDialog()
+    End Sub
 End Class
 
 

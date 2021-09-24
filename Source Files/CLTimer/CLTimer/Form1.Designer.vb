@@ -34,6 +34,7 @@ Partial Class CLTimer
         Me.Lane1Laps = New System.Windows.Forms.TextBox()
         Me.SetPortNoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Lane1 = New System.Windows.Forms.GroupBox()
+        Me.Ln1SpeedUnit = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Ln1Speed = New System.Windows.Forms.TextBox()
         Me.DQ1 = New System.Windows.Forms.Button()
@@ -46,6 +47,7 @@ Partial Class CLTimer
         Me.Rerun2 = New System.Windows.Forms.Button()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.Ln3SpeedUnit = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.Ln3Speed = New System.Windows.Forms.TextBox()
         Me.DQ3 = New System.Windows.Forms.Button()
@@ -63,6 +65,7 @@ Partial Class CLTimer
         Me.StateLn2 = New System.Windows.Forms.TextBox()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Ln2SpeedUnit = New System.Windows.Forms.Label()
         Me.Label8 = New System.Windows.Forms.Label()
         Me.Ln2Speed = New System.Windows.Forms.TextBox()
         Me.DQ2 = New System.Windows.Forms.Button()
@@ -106,11 +109,10 @@ Partial Class CLTimer
         Me.radHeat = New System.Windows.Forms.RadioButton()
         Me.radFinal = New System.Windows.Forms.RadioButton()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
-        Me.Ln1SpeedUnit = New System.Windows.Forms.Label()
-        Me.Ln2SpeedUnit = New System.Windows.Forms.Label()
-        Me.Ln3SpeedUnit = New System.Windows.Forms.Label()
         Me.SpeedLimitText = New System.Windows.Forms.Label()
         Me.SpeedLimit = New System.Windows.Forms.TextBox()
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Lane1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -158,7 +160,7 @@ Partial Class CLTimer
         '
         Me.ManualStartToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CLOCKSTARTToolStripMenuItem, Me.ManualStartToolStripMenuItem1, Me.HELPToolStripMenuItem3})
         Me.ManualStartToolStripMenuItem.Name = "ManualStartToolStripMenuItem"
-        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ManualStartToolStripMenuItem.Text = "Start Type"
         '
         'HELPToolStripMenuItem3
@@ -190,7 +192,7 @@ Partial Class CLTimer
         'SetPortNoToolStripMenuItem
         '
         Me.SetPortNoToolStripMenuItem.Name = "SetPortNoToolStripMenuItem"
-        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
+        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.SetPortNoToolStripMenuItem.Text = "Set Port 1 No."
         '
         'Lane1
@@ -212,6 +214,17 @@ Partial Class CLTimer
         Me.Lane1.Size = New System.Drawing.Size(286, 123)
         Me.Lane1.TabIndex = 109
         Me.Lane1.TabStop = False
+        '
+        'Ln1SpeedUnit
+        '
+        Me.Ln1SpeedUnit.AutoSize = True
+        Me.Ln1SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln1SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Ln1SpeedUnit.Location = New System.Drawing.Point(231, 88)
+        Me.Ln1SpeedUnit.Name = "Ln1SpeedUnit"
+        Me.Ln1SpeedUnit.Size = New System.Drawing.Size(39, 20)
+        Me.Ln1SpeedUnit.TabIndex = 27
+        Me.Ln1SpeedUnit.Text = "s/10"
         '
         'Label5
         '
@@ -348,6 +361,17 @@ Partial Class CLTimer
         Me.GroupBox2.Size = New System.Drawing.Size(286, 123)
         Me.GroupBox2.TabIndex = 112
         Me.GroupBox2.TabStop = False
+        '
+        'Ln3SpeedUnit
+        '
+        Me.Ln3SpeedUnit.AutoSize = True
+        Me.Ln3SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln3SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Ln3SpeedUnit.Location = New System.Drawing.Point(230, 88)
+        Me.Ln3SpeedUnit.Name = "Ln3SpeedUnit"
+        Me.Ln3SpeedUnit.Size = New System.Drawing.Size(39, 20)
+        Me.Ln3SpeedUnit.TabIndex = 29
+        Me.Ln3SpeedUnit.Text = "s/10"
         '
         'Label9
         '
@@ -497,7 +521,7 @@ Partial Class CLTimer
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SetupToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SetupToolStripMenuItem, Me.HelpToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional
@@ -524,6 +548,17 @@ Partial Class CLTimer
         Me.GroupBox1.Size = New System.Drawing.Size(286, 123)
         Me.GroupBox1.TabIndex = 111
         Me.GroupBox1.TabStop = False
+        '
+        'Ln2SpeedUnit
+        '
+        Me.Ln2SpeedUnit.AutoSize = True
+        Me.Ln2SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Ln2SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Ln2SpeedUnit.Location = New System.Drawing.Point(230, 88)
+        Me.Ln2SpeedUnit.Name = "Ln2SpeedUnit"
+        Me.Ln2SpeedUnit.Size = New System.Drawing.Size(39, 20)
+        Me.Ln2SpeedUnit.TabIndex = 29
+        Me.Ln2SpeedUnit.Text = "s/10"
         '
         'Label8
         '
@@ -960,39 +995,6 @@ Partial Class CLTimer
         Me.GroupBox5.TabStop = False
         Me.GroupBox5.Text = "Race Management"
         '
-        'Ln1SpeedUnit
-        '
-        Me.Ln1SpeedUnit.AutoSize = True
-        Me.Ln1SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln1SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Ln1SpeedUnit.Location = New System.Drawing.Point(231, 88)
-        Me.Ln1SpeedUnit.Name = "Ln1SpeedUnit"
-        Me.Ln1SpeedUnit.Size = New System.Drawing.Size(39, 20)
-        Me.Ln1SpeedUnit.TabIndex = 27
-        Me.Ln1SpeedUnit.Text = "s/10"
-        '
-        'Ln2SpeedUnit
-        '
-        Me.Ln2SpeedUnit.AutoSize = True
-        Me.Ln2SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln2SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Ln2SpeedUnit.Location = New System.Drawing.Point(230, 88)
-        Me.Ln2SpeedUnit.Name = "Ln2SpeedUnit"
-        Me.Ln2SpeedUnit.Size = New System.Drawing.Size(39, 20)
-        Me.Ln2SpeedUnit.TabIndex = 29
-        Me.Ln2SpeedUnit.Text = "s/10"
-        '
-        'Ln3SpeedUnit
-        '
-        Me.Ln3SpeedUnit.AutoSize = True
-        Me.Ln3SpeedUnit.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Ln3SpeedUnit.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Ln3SpeedUnit.Location = New System.Drawing.Point(230, 88)
-        Me.Ln3SpeedUnit.Name = "Ln3SpeedUnit"
-        Me.Ln3SpeedUnit.Size = New System.Drawing.Size(39, 20)
-        Me.Ln3SpeedUnit.TabIndex = 29
-        Me.Ln3SpeedUnit.Text = "s/10"
-        '
         'SpeedLimitText
         '
         Me.SpeedLimitText.AutoSize = True
@@ -1016,6 +1018,21 @@ Partial Class CLTimer
         Me.SpeedLimit.Text = "00.0"
         Me.SpeedLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.SpeedLimit.Visible = False
+        '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutToolStripMenuItem})
+        Me.HelpToolStripMenuItem.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(45, 20)
+        Me.HelpToolStripMenuItem.Text = "Help"
+        '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.AboutToolStripMenuItem.Text = "About"
         '
         'CLTimer
         '
@@ -1141,4 +1158,6 @@ Partial Class CLTimer
     Friend WithEvents Ln2SpeedUnit As Label
     Friend WithEvents SpeedLimitText As Label
     Friend WithEvents SpeedLimit As TextBox
+    Friend WithEvents HelpToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
 End Class
