@@ -1,16 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="CLTimer.Lap">
-    <Position X="11.75" Y="0.5" Width="1.5" />
+    <Position X="12" Y="5.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAgAAAAAAAgABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>lapDataModel.vb</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CLTimer.RaceClass">
-    <Position X="2.5" Y="0.5" Width="2" />
+    <Position X="2.5" Y="0.75" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AACAABAAAAjAAAAARQIMAAQBoABAIIAgAQAAAAAAAAA=</HashCode>
+      <HashCode>AEAAABAAAAjAAAAARQIMAAQAoABAIIBgAQAAAAAAAAA=</HashCode>
       <FileName>raceClassDataModel.vb</FileName>
     </TypeIdentifier>
   </Class>
@@ -22,9 +28,12 @@
     </TypeIdentifier>
   </Class>
   <Class Name="CLTimer.Laps">
-    <Position X="10.25" Y="0.5" Width="1.5" />
+    <Position X="10.5" Y="5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAIAAAAAACAAAAAAAAAABAAEAAAAAAAAAQAAAABAAAA=</HashCode>
+      <HashCode>AAIAAAAAACAAAAAAAAAABAAEgAAAAAAAAQAAAABAAAA=</HashCode>
       <FileName>lapDataModel.vb</FileName>
     </TypeIdentifier>
   </Class>
@@ -36,16 +45,39 @@
     </TypeIdentifier>
   </Class>
   <Class Name="CLTimer.RaceLapResults">
-    <Position X="8.25" Y="0.5" Width="1.5" />
+    <Position X="9" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAIAAAAAAAAAAAAAAAAABAAEAAAAAAAAAAAAAABAAAA=</HashCode>
       <FileName>raceDataModel.vb</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CLTimer.Race">
-    <Position X="6.5" Y="0.5" Width="1.5" />
+    <Position X="6.25" Y="0.75" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
-      <HashCode>AAIAAAQAAAoAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>KAIAIASAAgoAAAIAAAAAAAUIIABACAAAAAAAAEAAAAA=</HashCode>
+      <FileName>raceDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.RaceResults">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAIAAAACAAAAAAAAAAAABAAEAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>raceDataModel.vb</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLTimer.RaceResult">
+    <Position X="10.5" Y="0.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAgAAAAAAAAAAgSAAAAAAIAAAEAAAJAAEQA=</HashCode>
       <FileName>raceDataModel.vb</FileName>
     </TypeIdentifier>
   </Class>

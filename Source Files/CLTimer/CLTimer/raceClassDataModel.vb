@@ -5,7 +5,7 @@ Public Class RaceClass
         Get
             Return nameValue
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             nameValue = value
         End Set
     End Property
@@ -14,7 +14,7 @@ Public Class RaceClass
         Get
             Return heatDistanceValue
         End Get
-        Set(ByVal value As Integer)
+        Set(value As Integer)
             heatDistanceValue = value
         End Set
     End Property
@@ -23,7 +23,7 @@ Public Class RaceClass
         Get
             Return finalDistanceValue
         End Get
-        Set(ByVal value As Integer)
+        Set(value As Integer)
             finalDistanceValue = value
         End Set
     End Property
@@ -32,7 +32,7 @@ Public Class RaceClass
         Get
             Return TypeValue
         End Get
-        Set(ByVal value As String)
+        Set(value As String)
             TypeValue = value
         End Set
     End Property
@@ -41,7 +41,7 @@ Public Class RaceClass
         Get
             Return warmUpTimeValue
         End Get
-        Set(ByVal value As Integer)
+        Set(value As Integer)
             warmUpTimeValue = value
         End Set
     End Property
@@ -50,7 +50,7 @@ Public Class RaceClass
         Get
             Return coolDownTimeValue
         End Get
-        Set(ByVal value As Integer)
+        Set(value As Integer)
             coolDownTimeValue = value
         End Set
     End Property
@@ -59,7 +59,7 @@ Public Class RaceClass
         Get
             Return maxHeatTimeValue
         End Get
-        Set(ByVal value As Integer)
+        Set(value As Integer)
             maxHeatTimeValue = value
         End Set
     End Property
@@ -68,7 +68,7 @@ Public Class RaceClass
         Get
             Return maxFinalTimeValue
         End Get
-        Set(ByVal value As Integer)
+        Set(value As Integer)
             maxFinalTimeValue = value
         End Set
     End Property
@@ -77,29 +77,29 @@ Public Class RaceClass
         Get
             Return maxSpeedValue
         End Get
-        Set(ByVal value As Single)
+        Set(value As Single)
             maxSpeedValue = value
         End Set
     End Property
-    Private lapsToTimeValue As Integer
-    Public Property LapsToTime() As Integer
+    Private lapsToTimeOverValue As Integer
+    Public Property LapsToTimeOver() As Integer
         Get
-            Return lapsToTimeValue
+            Return lapsToTimeOverValue
         End Get
-        Set(ByVal value As Integer)
-            lapsToTimeValue = value
+        Set(value As Integer)
+            lapsToTimeOverValue = value
         End Set
     End Property
 End Class
 Public Class RaceClasses
     Inherits System.Collections.CollectionBase
     ' Restricts to Race types, items that can be added to the collection.
-    Public Sub Add(ByVal aRace As RaceClass)
+    Public Sub Add(aRace As RaceClass)
         ' Invokes Add method of the List object to add a race.
         List.Add(aRace)
     End Sub
 
-    Public Sub Remove(ByVal index As Integer)
+    Public Sub Remove(index As Integer)
         ' Check to see if there is a race at the supplied index.
         If index > Count - 1 Or index < 0 Then
             ' If no race exists at index, .....
@@ -111,7 +111,7 @@ Public Class RaceClasses
 
     ' This line declares the Item property as ReadOnly, and 
     ' declares that it will return a Race object.
-    Public ReadOnly Property Item(ByVal index As Integer) As RaceClass
+    Public ReadOnly Property Item(index As Integer) As RaceClass
         Get
             ' The appropriate item is retrieved from the List object and 
             ' explicitly cast to the Race type, then returned to the 
@@ -152,7 +152,7 @@ Public Class RaceClasses
                             .MaxHeatTime = fields(5),
                             .MaxFinalTime = fields(6),
                             .MaxSpeed = fields(9),
-                            .LapsToTime = fields(10)
+                            .LapsToTimeOver = fields(10)
                         }
 
                         If fields(1) = 0 Then
@@ -176,7 +176,7 @@ Public Class RaceClasses
                 .MaxHeatTime = 6000,
                 .MaxFinalTime = 9000,
                 .MaxSpeed = 0.0,
-                .LapsToTime = 10
+                .LapsToTimeOver = 10
             }
             Me.Add(myRace)
         End If

@@ -61,9 +61,12 @@ Partial Class CLTimer
         Me.tmrSecondsCounter = New System.Windows.Forms.Timer(Me.components)
         Me.tbError = New System.Windows.Forms.TextBox()
         Me.SetupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ResultsDirectoryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DNF2 = New System.Windows.Forms.Button()
         Me.StateLn2 = New System.Windows.Forms.TextBox()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.Ln2SpeedUnit = New System.Windows.Forms.Label()
         Me.Label8 = New System.Windows.Forms.Label()
@@ -111,8 +114,7 @@ Partial Class CLTimer
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
         Me.SpeedLimitText = New System.Windows.Forms.Label()
         Me.SpeedLimit = New System.Windows.Forms.TextBox()
-        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FolderBrowserDialogRaceResults = New System.Windows.Forms.FolderBrowserDialog()
         Me.Lane1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -148,7 +150,7 @@ Partial Class CLTimer
         Me.Ln2Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln2Time.TabIndex = 12
         Me.Ln2Time.TabStop = False
-        Me.Ln2Time.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.Ln2Time.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'CLOCKSTARTToolStripMenuItem
         '
@@ -160,7 +162,7 @@ Partial Class CLTimer
         '
         Me.ManualStartToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CLOCKSTARTToolStripMenuItem, Me.ManualStartToolStripMenuItem1, Me.HELPToolStripMenuItem3})
         Me.ManualStartToolStripMenuItem.Name = "ManualStartToolStripMenuItem"
-        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
         Me.ManualStartToolStripMenuItem.Text = "Start Type"
         '
         'HELPToolStripMenuItem3
@@ -177,7 +179,7 @@ Partial Class CLTimer
         Me.Lane2laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane2laps.TabIndex = 11
         Me.Lane2laps.TabStop = False
-        Me.Lane2laps.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.Lane2laps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Lane1Laps
         '
@@ -187,13 +189,13 @@ Partial Class CLTimer
         Me.Lane1Laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane1Laps.TabIndex = 10
         Me.Lane1Laps.TabStop = False
-        Me.Lane1Laps.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.Lane1Laps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'SetPortNoToolStripMenuItem
         '
         Me.SetPortNoToolStripMenuItem.Name = "SetPortNoToolStripMenuItem"
-        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.SetPortNoToolStripMenuItem.Text = "Set Port 1 No."
+        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.SetPortNoToolStripMenuItem.Text = "Set Serial Port No."
         '
         'Lane1
         '
@@ -445,7 +447,7 @@ Partial Class CLTimer
         Me.Ln3Time.Size = New System.Drawing.Size(106, 31)
         Me.Ln3Time.TabIndex = 12
         Me.Ln3Time.TabStop = False
-        Me.Ln3Time.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.Ln3Time.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'Lane3Laps
         '
@@ -455,7 +457,7 @@ Partial Class CLTimer
         Me.Lane3Laps.Size = New System.Drawing.Size(60, 31)
         Me.Lane3Laps.TabIndex = 11
         Me.Lane3Laps.TabStop = False
-        Me.Lane3Laps.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.Lane3Laps.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'DNF3
         '
@@ -493,11 +495,17 @@ Partial Class CLTimer
         '
         'SetupToolStripMenuItem
         '
-        Me.SetupToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManualStartToolStripMenuItem, Me.SetPortNoToolStripMenuItem})
+        Me.SetupToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManualStartToolStripMenuItem, Me.SetPortNoToolStripMenuItem, Me.ResultsDirectoryToolStripMenuItem})
         Me.SetupToolStripMenuItem.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Bold)
         Me.SetupToolStripMenuItem.Name = "SetupToolStripMenuItem"
         Me.SetupToolStripMenuItem.Size = New System.Drawing.Size(52, 20)
         Me.SetupToolStripMenuItem.Text = "Setup"
+        '
+        'ResultsDirectoryToolStripMenuItem
+        '
+        Me.ResultsDirectoryToolStripMenuItem.Name = "ResultsDirectoryToolStripMenuItem"
+        Me.ResultsDirectoryToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.ResultsDirectoryToolStripMenuItem.Text = "Results Directory"
         '
         'DNF2
         '
@@ -528,6 +536,21 @@ Partial Class CLTimer
         Me.MenuStrip1.Size = New System.Drawing.Size(594, 24)
         Me.MenuStrip1.TabIndex = 125
         Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'HelpToolStripMenuItem
+        '
+        Me.HelpToolStripMenuItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutToolStripMenuItem})
+        Me.HelpToolStripMenuItem.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(45, 20)
+        Me.HelpToolStripMenuItem.Text = "Help"
+        '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(108, 22)
+        Me.AboutToolStripMenuItem.Text = "About"
         '
         'GroupBox1
         '
@@ -670,6 +693,7 @@ Partial Class CLTimer
         '
         'tbAmbSw
         '
+        Me.tbAmbSw.BackColor = System.Drawing.SystemColors.Control
         Me.tbAmbSw.Location = New System.Drawing.Point(167, 21)
         Me.tbAmbSw.Name = "tbAmbSw"
         Me.tbAmbSw.ReadOnly = True
@@ -680,6 +704,7 @@ Partial Class CLTimer
         '
         'tbGrnSw
         '
+        Me.tbGrnSw.BackColor = System.Drawing.SystemColors.Control
         Me.tbGrnSw.Location = New System.Drawing.Point(118, 21)
         Me.tbGrnSw.Name = "tbGrnSw"
         Me.tbGrnSw.ReadOnly = True
@@ -700,6 +725,7 @@ Partial Class CLTimer
         '
         'tbRedSw
         '
+        Me.tbRedSw.BackColor = System.Drawing.SystemColors.Control
         Me.tbRedSw.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tbRedSw.Location = New System.Drawing.Point(69, 21)
         Me.tbRedSw.Name = "tbRedSw"
@@ -1019,20 +1045,9 @@ Partial Class CLTimer
         Me.SpeedLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.SpeedLimit.Visible = False
         '
-        'HelpToolStripMenuItem
+        'FolderBrowserDialogRaceResults
         '
-        Me.HelpToolStripMenuItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutToolStripMenuItem})
-        Me.HelpToolStripMenuItem.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(45, 20)
-        Me.HelpToolStripMenuItem.Text = "Help"
-        '
-        'AboutToolStripMenuItem
-        '
-        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.AboutToolStripMenuItem.Text = "About"
+        Me.FolderBrowserDialogRaceResults.RootFolder = System.Environment.SpecialFolder.MyDocuments
         '
         'CLTimer
         '
@@ -1160,4 +1175,6 @@ Partial Class CLTimer
     Friend WithEvents SpeedLimit As TextBox
     Friend WithEvents HelpToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ResultsDirectoryToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents FolderBrowserDialogRaceResults As FolderBrowserDialog
 End Class
