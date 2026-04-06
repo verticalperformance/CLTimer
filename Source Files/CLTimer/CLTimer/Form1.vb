@@ -17,6 +17,8 @@
 '23/9/21    Remove unrequired declarations
 '           Add Live Speed
 '21/3/25    Add results directory handling
+'6/4/26     Show results directory in caption
+'           Add ability for starter remote button to control the autostart
 
 Imports System.Text
 Imports System
@@ -160,6 +162,8 @@ Public Class CLTimer
         ' Check if results path exists, if not prompt to select one
         If Not My.Computer.FileSystem.DirectoryExists(RaceResultsPath) Then
             ChooseResultsDirectory(True)
+        Else
+            Me.Text = "Control Line Timer - " & RaceResultsPath
         End If
 
 
@@ -268,12 +272,58 @@ Loop1:
             Case "Idle"
                 'do nothing
             Case "WaitStart"
-                'do nothing, waiting for start button
+                'do nothing, waiting for start button to be pressed
+
+                ReadIn1()               'read serial port 1 (Timers)
+                x = DataIn.Length
+                y = 0
+                While y < x             ' handle all char's received seperately
+                    char1 = DataIn.Substring(y, 1)
+                    If InStr("DX", char1) Then
+                        If char1 = "D" Then
+                            x = 0       'ignore anything else received
+                            tmrCommsOK.Stop()                 'any valid char resets timeout
+                            tmrCommsOK.Start()
+                            DataOk = True
+                            BnStart_Click(Me, Nothing)  ' Click the start button to commence autostart
+                            RunState = "AutoStart"
+                        End If
+                        DataOk = True
+                    Else
+                        tbError.Text = ("Data Error")
+                        tbError.BackColor = Color.Red
+                    End If
+                    y += 1
+                End While
+
             Case "AutoStart"
+                ReadIn1()               'read serial port 1 (Timers)
+                x = DataIn.Length
+                y = 0
+                While y < x             ' handle all char's received seperately
+                    char1 = DataIn.Substring(y, 1)
+                    If InStr("DX", char1) Then
+                        If char1 = "D" Then
+                            x = 0       'ignore anything else received
+                            tmrCommsOK.Stop()                 'any valid char resets timeout
+                            tmrCommsOK.Start()
+                            DataOk = True
+                            BnStart_Click(Me, Nothing) ' Click the start button to cancel autostart
+                            RunState = "WaitStart"
+                        End If
+                        DataOk = True
+                    Else
+                        tbError.Text = ("Data Error")
+                        tbError.BackColor = Color.Red
+                    End If
+                    y += 1
+                End While
+
                 If IncTime Then
                     TimerDisplayCount(CountDownTimerDisplay, -1, True) ' one second or more has elapsed, decrement start counter time
                     IncTime = False
                 End If
+
             Case "WaitStartPress"   'Waiting for manual starter switch press
                 ReadIn1()               'read serial port 1 (Timers)
                 x = DataIn.Length
@@ -283,6 +333,8 @@ Loop1:
                     If InStr("DX", char1) Then
                         If char1 = "D" Then
                             x = 0       'ignore anything else received
+                            tmrCommsOK.Stop()                 'any valid char resets timeout
+                            tmrCommsOK.Start()
                             StartRace()
                         End If
                         DataOk = True
@@ -847,7 +899,7 @@ Loop1:
 
                 bnStartRace.Focus()
 
-                RunState = "WaitStart"
+                RunState = "WaitStart" ' Allows autostart to be initiated by remote button
 
                 ' Reset the warmup/cooldown times
                 StartCount = myRaceClasses.Item(ClassName.SelectedIndex).WarmUpTime + myRaceClasses.Item(ClassName.SelectedIndex).CoolDownTime
@@ -898,7 +950,8 @@ Loop1:
                         SetDisplayAsTimer(StartCount, CountDownTimerDisplay)
                         ticPreviousSecond = Now.Ticks
                         tmrSecondsCounter.Start()
-                        tmrCommsOK.Stop()
+                        'tmrCommsOK.Stop()
+                        'tmrCommsOK.Start()
                         RunState = "AutoStart"
                         bnStartRace.Text = "Stop CountDown"
                         ClkLabel.Visible = True
@@ -910,7 +963,7 @@ Loop1:
                         StartCount = 0
                         ticPreviousSecond = Now.Ticks
                         tmrSecondsCounter.Start()
-                        '                       SetDisplayToZeroLapsAndTime()               'Set displays to 00 for manual start
+                        ' SetDisplayToZeroLapsAndTime()               'Set displays to 00 for manual start
 
                         RunState = "WaitStartPress"
                         bnStartRace.Text = "Clear and Reset"
@@ -933,11 +986,11 @@ Loop1:
                     End If
 
                 Case "AutoStart"        'Cancel auto start count down
-
                     SetFormControlsToInRaceState(False)
 
                     tmrSecondsCounter.Stop()
-                    tmrCommsOK.Start()
+                    'tmrCommsOK.Stop()
+                    'tmrCommsOK.Start()
                     RunState = "WaitStart"
 
                     bnStartRace.Text = "Start Countdown"
@@ -1794,6 +1847,7 @@ endsub:
 
         If FolderBrowserDialogRaceResults.ShowDialog() = DialogResult.OK Then
             RaceResultsPath = FolderBrowserDialogRaceResults.SelectedPath
+            Me.Text = "Control Line Timer - " & RaceResultsPath
         End If
     End Sub
 
@@ -1815,8 +1869,6 @@ endsub:
         file = Nothing
 
     End Sub
-
-
 
 End Class
 

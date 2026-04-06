@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class CLTimer
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class CLTimer
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(CLTimer))
@@ -162,7 +162,7 @@ Partial Class CLTimer
         '
         Me.ManualStartToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CLOCKSTARTToolStripMenuItem, Me.ManualStartToolStripMenuItem1, Me.HELPToolStripMenuItem3})
         Me.ManualStartToolStripMenuItem.Name = "ManualStartToolStripMenuItem"
-        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.ManualStartToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ManualStartToolStripMenuItem.Text = "Start Type"
         '
         'HELPToolStripMenuItem3
@@ -194,7 +194,7 @@ Partial Class CLTimer
         'SetPortNoToolStripMenuItem
         '
         Me.SetPortNoToolStripMenuItem.Name = "SetPortNoToolStripMenuItem"
-        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.SetPortNoToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.SetPortNoToolStripMenuItem.Text = "Set Serial Port No."
         '
         'Lane1
@@ -504,7 +504,7 @@ Partial Class CLTimer
         'ResultsDirectoryToolStripMenuItem
         '
         Me.ResultsDirectoryToolStripMenuItem.Name = "ResultsDirectoryToolStripMenuItem"
-        Me.ResultsDirectoryToolStripMenuItem.Size = New System.Drawing.Size(175, 22)
+        Me.ResultsDirectoryToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.ResultsDirectoryToolStripMenuItem.Text = "Results Directory"
         '
         'DNF2
